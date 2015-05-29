@@ -1,0 +1,32 @@
+<div class="dialog-frame extraction about">
+    <div class="dialog-body">
+        <fieldset>
+            <p>
+                You can filter time intervals by given values:
+            </p>
+
+            <div class="dialog-body" bind="dialogBody">
+                <p><label for="startColumn">start column</label><select id="startColumn"></select></p>
+
+                <p><label for="endColumn">end column</label><select id="endColumn"></select></p>
+
+                <p><label for="inputDateFormat">input format</label><input id="inputDateFormat"></p>
+
+                <p><label for="inputDateFormat">max</label><input id="maxInterval"></p>
+
+                <p><label for="inputDateFormat">min</label><input id="minInterval"></p>
+
+                <p><label for="inputDateFormat">unit</label><input id="unitInterval"></p>
+            </div>
+            <div class="dialog-footer" bind="dialogFooter">
+                <div class="options">
+
+                    <button bind="filterInterval" class="button default">filter</button>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="dialog-footer">
+        <button class="button" bind="close">Close</button>
+    </div>
+</div>

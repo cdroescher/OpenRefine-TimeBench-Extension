@@ -7,7 +7,14 @@ ExtensionBar.addExtensionMenu({
             "id" : "timebench-extension/ReformatDate",
             label: "reformat date",
             click: dialogHandler(ReformatDate)
+        },
+
+        {
+            "id" : "timebench-extension/FilterInterval",
+            label: "filter interval",
+            click: dialogHandler(FilterInterval)
         }
+
     ]
 });
 

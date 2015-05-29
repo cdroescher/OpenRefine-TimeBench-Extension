@@ -15,6 +15,7 @@ function init() {
       "scripts/config.js",
       "scripts/util.js",
       "dialogs/ReformatDate.js",
+      "dialogs/FilterInterval.js",
       "scripts/menus.js"
     ]
   );
@@ -22,6 +23,7 @@ function init() {
     "project/styles",
     module, [
       "styles/main.less",
+      "dialogs/FilterInterval.less",
       "dialogs/ReformatDate.less"
     ]
   );
