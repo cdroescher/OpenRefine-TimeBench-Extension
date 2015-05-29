@@ -1,4 +1,4 @@
-package org.extraction.operations;
+package org.extraction.reformat;
 
 import com.google.refine.history.Change;
 import com.google.refine.model.Column;
@@ -9,6 +9,7 @@ import com.google.refine.model.changes.ColumnAdditionChange;
 import com.google.refine.model.changes.ColumnRemovalChange;
 import com.google.refine.util.JSONUtilities;
 import com.google.refine.util.Pool;
+import org.joda.time.DateTime;
 import org.json.*;
 
 import java.io.IOException;
@@ -19,19 +20,19 @@ import java.util.List;
 import java.util.Properties;
 
 
-public class DateReformateChange implements Change {
-    private final int columnIndex;
-    private final DateEntity[] objects;
-    private final String operation;
-    private final String datePattern;
-    private final List<Integer> addedRowIds;
+public class ReformateDateChange implements Change {
+    private int columnIndex;
+    private DateTime[] dateTimeArray;
+    private String operation;
+    private ArrayList<String> dateFormatList;
+    private List<Integer> addedRowIds;
 
-    public DateReformateChange(final int columnIndex, final String operation, final String datePattern, final DateEntity[] objects) {
+    public ReformateDateChange(int columnIndex, String operation, ArrayList<String> dateFormatList, String outputDateFormat, DateTime[] dateTimeArray) {
         this.columnIndex = columnIndex;
         this.operation = operation;
-        this.objects = objects;
+        this.dateTimeArray = dateTimeArray;
         this.addedRowIds = new ArrayList<Integer>();
-        this.datePattern = datePattern;
+        this.dateFormatList = dateFormatList;
     }
 
 
@@ -51,6 +52,7 @@ public class DateReformateChange implements Change {
         }
     }
 
+    @Override
     public void save(final Writer writer, final Properties options) throws IOException {
         final JSONWriter json = new JSONWriter(writer);
         try {
@@ -59,18 +61,25 @@ public class DateReformateChange implements Change {
             json.value(this.columnIndex);
             json.key("operation");
             json.value(this.operation);
-            json.key("country");
-            json.value(this.datePattern);
+            json.key("dateFormatList");
+            // TODO write JSON array because multiple input formats
+            json.value(this.dateFormatList);
+            // TODO write output date format
 
-            json.key("objects");
+            json.key("dateTimeList");
 
             /* Objects array */
             {
                 json.array();
                 /* Rows array */
-                for (final DateEntity ogg : objects) {
-                    /* Objects finded */
-                    ogg.writeTo(json);
+                for (final DateTime dateTime : dateTimeArray) {
+
+
+                  json.object();
+
+                    // TODO write joda dates
+
+                  json.endObject();
                 }
                 json.endArray();
             }
@@ -98,26 +107,30 @@ public class DateReformateChange implements Change {
         /* Simple properties */
         final int columnIndex = changeJson.getInt("column");
         final String operation = changeJson.getString("operation");
-        final String country = changeJson.getString("country");
 
+
+        //final String country = changeJson.getString("dateFormatList");
+      // TODO load JSON array because multiple input formats
 
         /* Objects array */
-        final JSONArray EntitiesJson = changeJson.getJSONArray("objects");
-        final DateEntity[] Entities = new DateEntity[EntitiesJson.length()];
+        final JSONArray dateTimeList = changeJson.getJSONArray("dateTimeList");
+        final DateTime[] dateTimes = new DateTime[dateTimeList.length()];
+
+
+
+
         /* Rows array */
-        for (int i = 0; i < Entities.length; i++) {
+        for (int i = 0; i < dateTimes.length; i++) {
 
-            JSONObject rowResults = EntitiesJson.getJSONObject(i);
-            JSONArray Results = rowResults.getJSONArray("array");
-            Entities[i] = new DateEntity();
-            for (int j = 0; j < Results.length(); j++) {
-                Entities[i].addOggettoTrovato(Results.getString(j));
+            JSONObject rowResults = dateTimeList.getJSONObject(i);
+            JSONArray dateTimeArray = rowResults.getJSONArray("array");
 
-            }
+            // TODO create new Joda DateTime Objects
+          new DateTime();
         }
 
         /* Reconstruct change object */
-        final DateReformateChange change = new DateReformateChange(columnIndex, operation, country, Entities);
+        final ReformateDateChange change = new ReformateDateChange(columnIndex, operation, null, null, dateTimes);
         for (final int addedRowId : JSONUtilities.getIntArray(changeJson, "addedRows"))
             change.addedRowIds.add(addedRowId);
         return change;
@@ -146,40 +159,10 @@ public class DateReformateChange implements Change {
         // Make sure there are rows
         if (rows.isEmpty())
             return;
-
-        // Make sure all rows have enough cells, creating new one as necessary
-        final int minRowSize = cellIndexes + 1;
-
-        int rowNumber = 0;
         addedRowIds.clear();
 
-        for (final DateEntity row : objects) {
-            // Create new blank rows if objects don't fit on a single line
-            int maxobject = 1;
-
-            if (row.getFoundDates() != null)
-                maxobject = Math.max(maxobject, row.getFoundDates().size());
-
-            for (int i = 1; i < maxobject; i++) {
-                final Row entityRow = new Row(minRowSize);
-                final int entityRowId = rowNumber + i;
-                for (int j = 0; j < minRowSize; j++)
-                    entityRow.cells.add(null);
-                rows.add(entityRowId, entityRow);
-                addedRowIds.add(entityRowId);
-            }
-
-            // Place all objects
-            final ArrayList<String> oggetti = row.getFoundDates();
-            for (int r = 0; r < oggetti.size(); r++) {
-                Row riga = rows.get(rowNumber + r);
-                riga.cells.set(cellIndexes, row.toCell(r));
-            }
-
-
-            // Advance to the next original row
-            rowNumber += maxobject;
-
+        for (final DateTime dateTime : dateTimeArray) {
+            //TODO add new values
         }
 
     }

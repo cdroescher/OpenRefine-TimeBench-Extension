@@ -1,6 +1,5 @@
-package org.extraction.operations;
+package org.extraction.reformat;
 
-import com.google.refine.model.AbstractOperation;
 import com.google.refine.model.Column;
 import com.google.refine.model.Project;
 import com.google.refine.operations.EngineDependentOperation;
@@ -10,20 +9,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
-public class DateReformateOperation extends EngineDependentOperation {
+public class ReformatDateOperation extends EngineDependentOperation {
 
     private final Column column;
-    private final String tipOp;
-    private final String dateFormat;
+    private final ArrayList<String> dateFormatList;
+    private String dateOutputFormat;
 
-    public DateReformateOperation(final Column column, final String tipOp, final String dateFormat, final JSONObject engineConfig) {
+    public ReformatDateOperation(final Column column, final ArrayList<String> dateFormatList, String dateOutputFormat, final JSONObject engineConfig) {
         super(engineConfig);
         this.column = column;
-        this.tipOp = tipOp;
-        this.dateFormat = dateFormat;
-
+        this.dateFormatList = dateFormatList;
+        this.dateOutputFormat = dateOutputFormat;
     }
 
     @Override
@@ -37,19 +36,17 @@ public class DateReformateOperation extends EngineDependentOperation {
         writer.value(getEngineConfig());
         writer.key("column");
         writer.value(column.getName());
-        writer.key("tipOp");
-        writer.value(tipOp);
 
         writer.endObject();
     }
 
     @Override
     protected String getBriefDescription(final Project project) {
-        return String.format("Extracting " + tipOp + " in column %s", column.getName());
+        return String.format("Reformat date in column %s", column.getName());
     }
 
     @Override
     public Process createProcess(final Project project, final Properties options) throws Exception {
-        return new DateReformateProcess(project, column, tipOp, dateFormat, this, getBriefDescription(project), getEngineConfig());
+        return new ReformateDateProcess(project, column, "reformatdate", dateFormatList, dateOutputFormat, this, getBriefDescription(project), getEngineConfig());
     }
 }

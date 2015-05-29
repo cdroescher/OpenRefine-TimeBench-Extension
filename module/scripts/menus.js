@@ -1,22 +1,14 @@
 /* Add menu to extension bar */
 ExtensionBar.addExtensionMenu({
 	id : "timebench-extension",
-	label : "convert to TimeBench",
-	submenu : [
-	{
-		id : "timebench-extension/about",
-		label : "convert ...",
-		click : dialogHandler(AboutDialog)
-	} ]
-});
-
-/* Add submenu to column header menu */
-DataTableColumnHeaderUI.extendMenu(function(column, columnHeaderUI, menu) {
-	MenuSystem.appendTo(menu, "", [ { /* separator */}, {
-		id : "timebench-extension/extraction",
-		label : "extract date",
-		click : dialogHandler(DateReformateDialog,column)
-	} ]);
+	label : "date operations",
+    "submenu" : [
+        {
+            "id" : "timebench-extension/ReformatDate",
+            label: "reformat date",
+            click: dialogHandler(ReformatDate)
+        }
+    ]
 });
 
 function dialogHandler(dialogConstructor) {

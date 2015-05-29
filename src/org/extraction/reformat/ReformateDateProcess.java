@@ -1,4 +1,4 @@
-package org.extraction.operations;
+package org.extraction.reformat;
 
 import com.google.refine.browsing.Engine;
 import com.google.refine.browsing.RowVisitor;
@@ -6,26 +6,28 @@ import com.google.refine.history.HistoryEntry;
 import com.google.refine.model.*;
 import com.google.refine.process.LongRunningProcess;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DateReformateProcess extends LongRunningProcess implements Runnable {
-    private final static Logger LOGGER = Logger.getLogger(DateReformateProcess.class);
-    private final static DateEntity EMPTY_RESULT_SET = new DateEntity();
-    private final String datePattern;
+public class ReformateDateProcess extends LongRunningProcess implements Runnable {
+    private final static Logger LOGGER = Logger.getLogger(ReformateDateProcess.class);
+    private final ArrayList<String> dateFormatList;
     private final Project project;
     private final Column column;
     private final String operation;
     private final AbstractOperation parentOperation;
     private final JSONObject engineConfig;
     private final long historyEntryId;
+    private String dateOutputFormat;
 
 
-    protected DateReformateProcess(final Project project, final Column column,
-                                   final String operation, final String datePattern,
+    protected ReformateDateProcess(final Project project, final Column column,
+                                   final String operation, ArrayList<String> dateFormatList, String dateOutputFormat,
                                    final AbstractOperation parentOperation, final String description,
                                    final JSONObject engineConfig) {
         super(description);
@@ -35,22 +37,23 @@ public class DateReformateProcess extends LongRunningProcess implements Runnable
         this.parentOperation = parentOperation;
         this.engineConfig = engineConfig;
         this.historyEntryId = HistoryEntry.allocateID();
-        this.datePattern = datePattern;
+        this.dateFormatList = dateFormatList;
+        this.dateOutputFormat = dateOutputFormat;
     }
 
     @Override
     public void run() {
         final int columnIndex = project.columnModel.getColumnIndexByName(column.getName()) + 1;
 
-        final DateEntity[] namedEntities = performExtraction();
+        final DateTime[] dateTimeArray = performExtraction();
 
         if (!_canceled) {
-            project.history.addEntry(new HistoryEntry(historyEntryId, project, _description, parentOperation, new DateReformateChange(columnIndex, operation, datePattern, namedEntities)));
+            project.history.addEntry(new HistoryEntry(historyEntryId, project, _description, parentOperation, new ReformateDateChange(columnIndex, operation, dateFormatList, dateOutputFormat, dateTimeArray)));
             project.processManager.onDoneProcess(this);
         }
     }
 
-    protected DateEntity[] performExtraction() {
+    protected DateTime[] performExtraction() {
         // Count all rows
         final int rowsTotal = project.rows.size();
         // Get the cell index of the column in which to perform entity extraction
@@ -60,11 +63,11 @@ public class DateReformateProcess extends LongRunningProcess implements Runnable
         final int rowsFiltered = filteredRowIndices.size();
 
         // Go through each row and extract entities if the row is part of the filter
-        final DateEntity[] namedEntities = new DateEntity[rowsTotal];
+        final DateTime[] dateTimes = new DateTime[rowsTotal];
         int rowsProcessed = 0;
         for (int rowIndex = 0; rowIndex < rowsTotal; rowIndex++) {
             // Initialize to the empty result set, in case no entities are extracted
-            namedEntities[rowIndex] = EMPTY_RESULT_SET;
+
             // If the row is part of the filter, extract entities
             if (filteredRowIndices.contains(rowIndex)) {
                 final Row row = project.rows.get(rowIndex);
@@ -74,8 +77,7 @@ public class DateReformateProcess extends LongRunningProcess implements Runnable
                 final String text = cellValue == null ? "" : cellValue.toString().trim();
                 // Perform extraction if the text is not empty
                 if (text.length() > 0) {
-                    final Extractor extractore = new Extractor(text, operation, datePattern);
-                    namedEntities[rowIndex] = extractore.extract();
+                  // TODO joda time reformat stuff
                 }
                 _progress = 100 * ++rowsProcessed / rowsFiltered;
             }
@@ -83,7 +85,7 @@ public class DateReformateProcess extends LongRunningProcess implements Runnable
             if (_canceled)
                 return null;
         }
-        return namedEntities;
+        return null;
     }
 
 
@@ -120,28 +122,4 @@ public class DateReformateProcess extends LongRunningProcess implements Runnable
         return this;
     }
 
-    protected static class Extractor {
-        private final static DateEntity EMPTY_ENTITY_SET = new DateEntity();
-
-        private final String text;
-        private final String operation;
-        private final String datePattern;
-        private DateEntity entity;
-
-        public Extractor(final String text, final String operation, String datePattern) {
-            this.text = text;
-            this.operation = operation;
-            this.entity = EMPTY_ENTITY_SET;
-            this.datePattern = datePattern;
-        }
-
-        public DateEntity extract() {
-            DateEntity risultati = new DateEntity();
-            if (text == null) {
-                return risultati;
-            }
-            risultati.addOggettoTrovato("testValue");
-            return risultati;
-        }
-    }
 }
