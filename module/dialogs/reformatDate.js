@@ -14,7 +14,9 @@ ReformatDate.prototype = {
         });
 
         $(".column-header").each(function () {
-            columnsReformat.push($(this).attr("title"));
+            if(!($(this).attr("title")==undefined)) {
+                columnsReformat.push($(this).attr("title"));
+            }
         });
     },
     show: function () {
@@ -43,5 +45,7 @@ ReformatDate.prototype = {
         Refine.postProcess('timebench-extension', 'date-reformation', data, {},
             { rowsChanged: true, modelsChanged: true });
         this.hide();
+        columnsReformat = [];
+        inputFormatArray = [];
     }
 };
