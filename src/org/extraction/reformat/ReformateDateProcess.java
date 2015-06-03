@@ -10,9 +10,7 @@ import org.joda.time.DateTime;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class ReformateDateProcess extends LongRunningProcess implements Runnable {
     private final static Logger LOGGER = Logger.getLogger(ReformateDateProcess.class);
@@ -23,10 +21,11 @@ public class ReformateDateProcess extends LongRunningProcess implements Runnable
     private final JSONObject engineConfig;
     private final long historyEntryId;
     private String dateOutputFormat;
+    private ArrayList<String> dateInputFormatList;
 
 
     protected ReformateDateProcess(Project project, Column column,
-                                   String operation, ArrayList<String> dateFormatList, String dateOutputFormat,
+                                   String operation, ArrayList<String> dateInputFormatList, String dateOutputFormat,
                                    AbstractOperation parentOperation, String description,
                                    JSONObject engineConfig) {
         super(description);
@@ -37,6 +36,8 @@ public class ReformateDateProcess extends LongRunningProcess implements Runnable
         this.engineConfig = engineConfig;
         this.historyEntryId = HistoryEntry.allocateID();
         this.dateOutputFormat = dateOutputFormat;
+        this.dateInputFormatList = dateInputFormatList;
+
     }
 
     @Override
@@ -53,13 +54,12 @@ public class ReformateDateProcess extends LongRunningProcess implements Runnable
 
     protected ArrayList<ReformatEntity> performExtraction() {
 
-        ArrayList<String> inputDateFormatList = new ArrayList<String>();
-        inputDateFormatList.add("dd-MM");
-        inputDateFormatList.add("MM-dd");
-        inputDateFormatList.add("yyyy-MM-dd");
-        inputDateFormatList.add("hh:mm-dd:MM");
+        dateInputFormatList.add("dd-MM-yyyy");
+        dateInputFormatList.add("MM-dd-yyyy");
+        dateInputFormatList.add("yyyy-MM-dd");
+        dateInputFormatList.add("hh:mm-dd:MM");
 
-        ArrayList<String> origin = new ArrayList<String>();
+        Map<Integer, String> origin = new HashMap<Integer, String>();
         // Count all rows
         int rowsTotal = project.rows.size();
         // Get the cell index of the column in which to perform entity extraction
@@ -81,7 +81,7 @@ public class ReformateDateProcess extends LongRunningProcess implements Runnable
                 Cell cell = row.getCell(cellIndex);
                 Serializable cellValue = cell == null ? null : cell.value;
                 String text = cellValue == null ? "" : cellValue.toString().trim();
-                origin.add(text);
+                origin.put(rowIndex, text);
 
                 _progress = 100 * ++rowsProcessed / rowsFiltered;
             }
@@ -90,9 +90,7 @@ public class ReformateDateProcess extends LongRunningProcess implements Runnable
                 return null;
         }
         Reformator reformator = new Reformator();
-        ArrayList<ReformatEntity> reformatEntities = reformator.reformatDateTime(inputDateFormatList, origin);
-
-        return reformatEntities;
+        return reformator.reformatDateTime(dateInputFormatList, origin);
     }
 
 

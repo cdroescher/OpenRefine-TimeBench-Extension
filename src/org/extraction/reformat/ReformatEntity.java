@@ -11,6 +11,16 @@ import java.util.Map;
  * Created by droescher on 01.06.15.
  */
 public class ReformatEntity {
+    private int rowId;
+
+    public void setRowId(int rowId) {
+        this.rowId = rowId;
+    }
+
+    public int getRowId() {
+        return rowId;
+    }
+
     enum ReformatState{
         NOT,
         UNIQUE,
@@ -19,7 +29,7 @@ public class ReformatEntity {
 
     private HashMap<String, DateTime> dateTimeFormatMap = new HashMap<String, DateTime>();
 
-    ReformatState getState(){
+    public ReformatState getState(){
         if(dateTimeFormatMap.size()==0){
             return ReformatState.NOT;
         }
