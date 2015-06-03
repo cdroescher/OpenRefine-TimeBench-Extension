@@ -1,6 +1,7 @@
 package org.extraction.reformat;
 
 import com.google.refine.history.Change;
+import com.google.refine.model.Cell;
 import com.google.refine.model.Column;
 import com.google.refine.model.Project;
 import com.google.refine.model.Row;
@@ -15,24 +16,20 @@ import org.json.*;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 
 public class ReformateDateChange implements Change {
     private int columnIndex;
-    private DateTime[] dateTimeArray;
-    private String operation;
-    private ArrayList<String> dateFormatList;
+    private String operation="reformatOperation";
+    private ArrayList<ReformatEntity> reformatEntityList;
     private List<Integer> addedRowIds;
 
-    public ReformateDateChange(int columnIndex, String operation, ArrayList<String> dateFormatList, String outputDateFormat, DateTime[] dateTimeArray) {
+    public ReformateDateChange(int columnIndex, String operation, String outputDateFormat, ArrayList<ReformatEntity> reformatEntityList) {
         this.columnIndex = columnIndex;
         this.operation = operation;
-        this.dateTimeArray = dateTimeArray;
         this.addedRowIds = new ArrayList<Integer>();
-        this.dateFormatList = dateFormatList;
+        this.reformatEntityList = reformatEntityList;
     }
 
 
@@ -55,43 +52,22 @@ public class ReformateDateChange implements Change {
     @Override
     public void save(final Writer writer, final Properties options) throws IOException {
         final JSONWriter json = new JSONWriter(writer);
+
         try {
+
             json.object();
             json.key("column");
             json.value(this.columnIndex);
             json.key("operation");
-            json.value(this.operation);
-            json.key("dateFormatList");
-            // TODO write JSON array because multiple input formats
-            json.value(this.dateFormatList);
-            // TODO write output date format
+            json.value(operation);
+            json.key("reformatEntityList");
 
-            json.key("dateTimeList");
-
-            /* Objects array */
-            {
-                json.array();
-                /* Rows array */
-                for (final DateTime dateTime : dateTimeArray) {
-
-
-                  json.object();
-
-                    // TODO write joda dates
-
-                  json.endObject();
-                }
-                json.endArray();
+            json.array();
+            for (ReformatEntity reformatEntity : reformatEntityList) {
+                reformatEntity.writeTo(json);
             }
-            json.key("addedRows");
+            json.endArray();
 
-            /* Added row numbers array */
-            {
-                json.array();
-                for (Integer addedRowId : addedRowIds)
-                    json.value(addedRowId.intValue());
-                json.endArray();
-            }
 
             json.endObject();
         } catch (JSONException error) {
@@ -103,34 +79,36 @@ public class ReformateDateChange implements Change {
         /* Parse JSON line */
         final JSONTokener tokener = new JSONTokener(reader.readLine());
         final JSONObject changeJson = (JSONObject) tokener.nextValue();
-        
+
         /* Simple properties */
         final int columnIndex = changeJson.getInt("column");
         final String operation = changeJson.getString("operation");
 
 
-        //final String country = changeJson.getString("dateFormatList");
-      // TODO load JSON array because multiple input formats
+
+        //final String country = changeJson.getString("reformatEntityList");
+        // TODO load JSON array because multiple input formats
 
         /* Objects array */
-        final JSONArray dateTimeList = changeJson.getJSONArray("dateTimeList");
-        final DateTime[] dateTimes = new DateTime[dateTimeList.length()];
+        final JSONArray dateTimeListJsonArray = changeJson.getJSONArray("reformatEntityList");
+        final ReformatEntity[] reformatEntityArray = new ReformatEntity[dateTimeListJsonArray.length()];
 
 
+        for (int i = 0; i < reformatEntityArray.length; i++) {
 
+            JSONObject rowResults = dateTimeListJsonArray.getJSONObject(i);
+            JSONArray jsonArray = rowResults.getJSONArray("array");
+            reformatEntityArray[i] = new ReformatEntity();
+            for (int j = 0; j < jsonArray.length(); j++) {
+                reformatEntityArray[i].addReformatEntity(null, new DateTime(jsonArray.getString(j)));
 
-        /* Rows array */
-        for (int i = 0; i < dateTimes.length; i++) {
-
-            JSONObject rowResults = dateTimeList.getJSONObject(i);
-            JSONArray dateTimeArray = rowResults.getJSONArray("array");
-
-            // TODO create new Joda DateTime Objects
-          new DateTime();
+            }
         }
 
-        /* Reconstruct change object */
-        final ReformateDateChange change = new ReformateDateChange(columnIndex, operation, null, null, dateTimes);
+
+    /* Reconstruct change object */
+        final ReformateDateChange change = new ReformateDateChange(columnIndex, operation, null, new ArrayList<ReformatEntity>(Arrays.asList(reformatEntityArray)));
+
         for (final int addedRowId : JSONUtilities.getIntArray(changeJson, "addedRows"))
             change.addedRowIds.add(addedRowId);
         return change;
@@ -161,9 +139,11 @@ public class ReformateDateChange implements Change {
             return;
         addedRowIds.clear();
 
-        for (final DateTime dateTime : dateTimeArray) {
-            //TODO add new values
+        for (Row row : rows) {
+            row.cells.set(cellIndexes, new Cell("test2", null));
+
         }
+
 
     }
 

@@ -18,9 +18,9 @@ public class ReformatDateCommand extends EngineDependentCommand {
         final String columnName = request.getParameter("column");
         final String dateInputFormatStringList = request.getParameter("dateInputFormatList");
         final String dateOutputFormat = request.getParameter("dateOutputFormat");
-        // TODO split date formats
+
         ArrayList<String> dateInputFormatList = new ArrayList<String>();
-      final Column column = project.columnModel.getColumnByName(columnName);
+        final Column column = project.columnModel.getColumnByName(columnName);
 
         try {
             return new ReformatDateOperation(column, dateInputFormatList, dateOutputFormat, getEngineConfig(request));

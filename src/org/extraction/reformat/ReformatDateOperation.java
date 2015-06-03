@@ -27,17 +27,17 @@ public class ReformatDateOperation extends EngineDependentOperation {
 
     @Override
     public void write(final JSONWriter writer, final Properties options) throws JSONException {
-        writer.object();
-        writer.key("op");
-        writer.value(OperationRegistry.s_opClassToName.get(getClass()));
-        writer.key("description");
-        writer.value(getBriefDescription(null));
-        writer.key("engineConfig");
-        writer.value(getEngineConfig());
-        writer.key("column");
-        writer.value(column.getName());
-
-        writer.endObject();
+//        writer.object();
+//        writer.key("op");
+//        writer.value(OperationRegistry.s_opClassToName.get(getClass()));
+//        writer.key("description");
+//        writer.value(getBriefDescription(null));
+//        writer.key("engineConfig");
+//        writer.value(getEngineConfig());
+//        writer.key("column");
+//        writer.value(column.getName());
+//
+//        writer.endObject();
     }
 
     @Override
