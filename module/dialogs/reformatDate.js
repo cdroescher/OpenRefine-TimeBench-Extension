@@ -5,12 +5,12 @@ var columnsReformat = [];
 var inputFormatArray = [];
 ReformatDate.prototype = {
     init: function () {
+        var self = this;
         this.dialogElement = $(DOM.loadHTML("timebench-extension", "dialogs/ReformatDate.html"));
         var controls = DOM.bind(this.dialogElement);
         controls.close.click(this.extraBound("hide"));
         controls.reformatDates.click(function () {
-            operation = "reformatDates";
-            self.reformat(operation);
+            self.reformat();
         });
 
         $(".column-header").each(function () {
@@ -37,7 +37,9 @@ ReformatDate.prototype = {
 
     reformat: function () {
         var data = {  };
-        data["test"] = "test" ;
+        data["inputFormats"] = inputFormatArray;
+        data["outputFormat"] = $('#outputDateFormat').val();
+        data["column"] = $("#reformatDateSelect option:selected" ).text();
         Refine.postProcess('timebench-extension', 'date-reformation', data, {},
             { rowsChanged: true, modelsChanged: true });
         this.hide();
