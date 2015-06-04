@@ -21,11 +21,11 @@ public class ReformateDateProcess extends LongRunningProcess implements Runnable
     private final JSONObject engineConfig;
     private final long historyEntryId;
     private String dateOutputFormat;
-    private ArrayList<String> dateInputFormatList;
+    private String[] dateInputFormatList;
 
 
     protected ReformateDateProcess(Project project, Column column,
-                                   String operation, ArrayList<String> dateInputFormatList, String dateOutputFormat,
+                                   String operation, String[] dateInputFormatList, String dateOutputFormat,
                                    AbstractOperation parentOperation, String description,
                                    JSONObject engineConfig) {
         super(description);
@@ -53,11 +53,6 @@ public class ReformateDateProcess extends LongRunningProcess implements Runnable
     }
 
     protected ArrayList<ReformatEntity> performExtraction() {
-
-        dateInputFormatList.add("dd-MM-yyyy");
-        dateInputFormatList.add("MM-dd-yyyy");
-        dateInputFormatList.add("yyyy-MM-dd");
-        dateInputFormatList.add("hh:mm-dd:MM");
 
         Map<Integer, String> origin = new HashMap<Integer, String>();
         // Count all rows

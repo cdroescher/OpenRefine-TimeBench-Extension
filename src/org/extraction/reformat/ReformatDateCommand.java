@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ReformatDateCommand extends EngineDependentCommand {
 
@@ -16,14 +17,15 @@ public class ReformatDateCommand extends EngineDependentCommand {
     @Override
     protected AbstractOperation createOperation(Project project, HttpServletRequest request, JSONObject engineConfig) throws Exception {
         final String columnName = request.getParameter("column");
-        final String dateInputFormatStringList = request.getParameter("dateInputFormatList");
-        final String dateOutputFormat = request.getParameter("dateOutputFormat");
+        final String dateInputFormatStringList = request.getParameter("inputFormats[]");
+        final String dateOutputFormat = request.getParameter("outputFormat");
+        Map parameterMap = request.getParameterMap();
+        String[] dateInputFormatStringArray = (String[]) parameterMap.get("inputFormats[]");
 
-        ArrayList<String> dateInputFormatList = new ArrayList<String>();
         final Column column = project.columnModel.getColumnByName(columnName);
 
         try {
-            return new ReformatDateOperation(column, dateInputFormatList, dateOutputFormat, getEngineConfig(request));
+            return new ReformatDateOperation(column, dateInputFormatStringArray, dateOutputFormat, getEngineConfig(request));
         } catch (JSONException e) {
             e.printStackTrace();
         }

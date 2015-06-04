@@ -14,11 +14,11 @@ import java.util.Properties;
 
 public class ReformatDateOperation extends EngineDependentOperation {
 
-    private final Column column;
-    private final ArrayList<String> dateFormatList;
+    private Column column;
+    private String[] dateFormatList;
     private String dateOutputFormat;
 
-    public ReformatDateOperation(final Column column, final ArrayList<String> dateFormatList, String dateOutputFormat, final JSONObject engineConfig) {
+    public ReformatDateOperation(Column column, String[] dateFormatList, String dateOutputFormat, final JSONObject engineConfig) {
         super(engineConfig);
         this.column = column;
         this.dateFormatList = dateFormatList;

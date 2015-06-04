@@ -24,19 +24,21 @@ public class ReformateDateChange implements Change {
     private String operation = "reformatOperation";
     private ArrayList<ReformatEntity> reformatEntityList;
     private List<Integer> addedRowIds;
+    private String outputDateFormat;
 
     public ReformateDateChange(int columnIndex, String operation, String outputDateFormat, ArrayList<ReformatEntity> reformatEntityList) {
         this.columnIndex = columnIndex;
         this.operation = operation;
         this.addedRowIds = new ArrayList<Integer>();
         this.reformatEntityList = reformatEntityList;
+        this.outputDateFormat = outputDateFormat;
     }
 
 
     @Override
     public void apply(final Project project) {
         int cellIndexes = createColumn(project);
-        insertValues(project, cellIndexes);
+        insertValues(project, cellIndexes, outputDateFormat);
         project.update();
     }
 
@@ -62,11 +64,11 @@ public class ReformateDateChange implements Change {
 
     /**
      * Insert the extracted named entities into rows with the specified cell indexes
-     *
-     * @param project     The project
+     *  @param project     The project
      * @param cellIndexes The cell indexes of the rows that will contain the named entities
+     * @param outputDateFormat
      */
-    protected void insertValues(final Project project, final int cellIndexes) {
+    protected void insertValues(final Project project, final int cellIndexes, String outputDateFormat) {
         final List<Row> rows = project.rows;
         // Make sure there are rows
         if (rows.isEmpty())
@@ -79,7 +81,7 @@ public class ReformateDateChange implements Change {
             if (!dateTimeFormatMap.isEmpty()) {
 
                 Iterator<DateTime> it = dateTimeFormatMap.values().iterator();
-                String out = it.next().toString("dd/MM/yyyy");
+                String out = it.next().toString(outputDateFormat);
 
                 if (reformatEntityList.get(i).getState() == ReformatEntity.ReformatState.AMBIGIOUS) {
                     out = out + " ?";

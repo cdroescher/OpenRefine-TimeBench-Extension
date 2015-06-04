@@ -13,7 +13,7 @@ import java.util.Map;
 public class Reformator {
 
 
-    public ArrayList<ReformatEntity> reformatDateTime(ArrayList<String> inputFormats, Map<Integer, String> originDateTimes) {
+    public ArrayList<ReformatEntity> reformatDateTime(String[] inputFormats, Map<Integer, String> originDateTimes) {
         ArrayList<ReformatEntity> resultList = new ArrayList<ReformatEntity>();
 
         for (Map.Entry<Integer, String> originDateTime : originDateTimes.entrySet()) {
