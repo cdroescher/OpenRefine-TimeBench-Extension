@@ -35,11 +35,10 @@ for following steps use the „project structure“ dialog window
 
 0. add joda-time:joda-time:2.8 as dependency to this openRefine extension
 0. add module dependency „core“ to module „appengine“
-0. build should possible without any errors
 0. add module dependency „core“ to module „server“
 0. add module dependency „main“ to module „server“
 0. add module dependency „core“ to module „server1“
 0. add module dependency „main“ to module „server1“
 0. start main class „com.google.refine.Refine“
 
-please feel free to rename and group the modules accordingly, because the suggestions of IntelliJ are unsightly in this case.
+please feel free to rename and rearrange the modules accordingly, because the suggestions of IntelliJ are unsightly in this case.
