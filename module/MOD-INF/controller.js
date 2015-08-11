@@ -6,6 +6,7 @@ var logger = Packages.org.slf4j.LoggerFactory.getLogger("timebench-extension"),
 function init() {
   logger.info("Initializing commands");
   register("date-reformation", new org.extraction.reformat.ReformatDateCommand());
+  register("decode-date-time-values", new org.extraction.reformat.DecodeDateTimeValueCommand());
 
   logger.info("Initializing client resources");
   var resourceManager = Packages.com.google.refine.ClientSideResourceManager;

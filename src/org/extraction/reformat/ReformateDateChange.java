@@ -1,5 +1,6 @@
 package org.extraction.reformat;
 
+import com.google.common.base.Joiner;
 import com.google.refine.history.Change;
 import com.google.refine.model.Cell;
 import com.google.refine.model.Column;
@@ -74,24 +75,14 @@ public class ReformateDateChange implements Change {
         if (rows.isEmpty())
             return;
         addedRowIds.clear();
-
         for (int i = 0; i < rows.size(); i++) {
             Row row = rows.get(i);
             HashMap<String, DateTime> dateTimeFormatMap = reformatEntityList.get(i).getDateTimeFormatMap();
-            if (!dateTimeFormatMap.isEmpty()) {
-
-                Iterator<DateTime> it = dateTimeFormatMap.values().iterator();
-                String out = it.next().toString(outputDateFormat);
-
-                if (reformatEntityList.get(i).getState() == ReformatEntity.ReformatState.AMBIGIOUS) {
-                    out = out + " ?";
-                }
-                row.cells.set(cellIndexes, new Cell(out, null));
+            if(!dateTimeFormatMap.isEmpty()){
+                Joiner joiner = Joiner.on(";");
+                row.cells.set(cellIndexes, new DateCell(joiner.join(dateTimeFormatMap.values()), dateTimeFormatMap, null));
             }
-
-
         }
-
     }
 
 
