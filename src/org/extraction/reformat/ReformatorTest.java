@@ -25,8 +25,8 @@ public class ReformatorTest {
         originDateTimes.add("05-06-2003");
         originDateTimes.add("2003-06-07");
 
-        Reformator reformator = new Reformator();
+       /* Reformator reformator = new Reformator();
         ArrayList<ReformatEntity> dateTimes = reformator.reformatDateTime(inputDateFormatList, originDateTimes);
-        System.out.print(dateTimes);
+        System.out.print(dateTimes);*/
     }
 }

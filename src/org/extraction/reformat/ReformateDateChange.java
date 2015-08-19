@@ -1,6 +1,5 @@
 package org.extraction.reformat;
 
-import com.google.common.base.Joiner;
 import com.google.refine.history.Change;
 import com.google.refine.model.Cell;
 import com.google.refine.model.Column;
@@ -9,13 +8,9 @@ import com.google.refine.model.Row;
 import com.google.refine.model.changes.CellAtRow;
 import com.google.refine.model.changes.ColumnAdditionChange;
 import com.google.refine.model.changes.ColumnRemovalChange;
-import com.google.refine.util.JSONUtilities;
-import com.google.refine.util.Pool;
 import org.joda.time.DateTime;
-import org.json.*;
 
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.Writer;
 import java.util.*;
 
@@ -78,9 +73,14 @@ public class ReformateDateChange implements Change {
         for (int i = 0; i < rows.size(); i++) {
             Row row = rows.get(i);
             HashMap<String, DateTime> dateTimeFormatMap = reformatEntityList.get(i).getDateTimeFormatMap();
-            if(!dateTimeFormatMap.isEmpty()){
-                Joiner joiner = Joiner.on(";");
-                row.cells.set(cellIndexes, new DateCell(joiner.join(dateTimeFormatMap.values()), dateTimeFormatMap, null));
+            if (!dateTimeFormatMap.isEmpty()) {
+                Iterator<DateTime> it = dateTimeFormatMap.values().iterator();
+                String out = it.next().toString(outputDateFormat);
+
+                if (reformatEntityList.get(i).getState() == ReformatEntity.ReformatState.AMBIGIOUS) {
+                    out = out + " ?";
+                }
+                row.cells.set(cellIndexes, new Cell(out, null));
             }
         }
     }
@@ -125,67 +125,6 @@ public class ReformateDateChange implements Change {
 
     @Override
     public void save(final Writer writer, final Properties options) throws IOException {
-//        final JSONWriter json = new JSONWriter(writer);
-//
-//        try {
-//
-//            json.object();
-//            json.key("column");
-//            json.value(this.columnIndex);
-//            json.key("operation");
-//            json.value(operation);
-//            json.key("reformatEntityList");
-//
-//
-//            for (ReformatEntity reformatEntity : reformatEntityList) {
-//                reformatEntity.writeTo(json);
-//            }
-//
-//
-//
-//            json.endObject();
-//        } catch (JSONException error) {
-//            throw new IOException(error);
-//        }
+        // TODO
     }
-
-    static public Change load(LineNumberReader reader, Pool pool) throws Exception {
-        /* Parse JSON line */
-        final JSONTokener tokener = new JSONTokener(reader.readLine());
-        final JSONObject changeJson = (JSONObject) tokener.nextValue();
-
-        /* Simple properties */
-        final int columnIndex = changeJson.getInt("column");
-        final String operation = changeJson.getString("operation");
-
-
-        //final String country = changeJson.getString("reformatEntityList");
-        // TODO load JSON array because multiple input formats
-
-        /* Objects array */
-        final JSONArray dateTimeListJsonArray = changeJson.getJSONArray("reformatEntityList");
-        final ReformatEntity[] reformatEntityArray = new ReformatEntity[dateTimeListJsonArray.length()];
-
-
-        for (int i = 0; i < reformatEntityArray.length; i++) {
-
-            JSONObject rowResults = dateTimeListJsonArray.getJSONObject(i);
-            JSONArray jsonArray = rowResults.getJSONArray("array");
-            reformatEntityArray[i] = new ReformatEntity();
-            for (int j = 0; j < jsonArray.length(); j++) {
-                reformatEntityArray[i].addReformatEntity(null, new DateTime(jsonArray.getString(j)));
-
-            }
-        }
-
-
-    /* Reconstruct change object */
-        final ReformateDateChange change = new ReformateDateChange(columnIndex, operation, null, new ArrayList<ReformatEntity>(Arrays.asList(reformatEntityArray)));
-
-        for (final int addedRowId : JSONUtilities.getIntArray(changeJson, "addedRows"))
-            change.addedRowIds.add(addedRowId);
-        return change;
-    }
-
-
 }

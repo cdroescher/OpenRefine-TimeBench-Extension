@@ -42,12 +42,10 @@ public class ReformateDateProcess extends LongRunningProcess implements Runnable
 
     @Override
     public void run() {
-        int columnIndex = project.columnModel.getColumnIndexByName(column.getName());
-
         ArrayList<ReformatEntity> reformatEntityList = performExtraction();
-
+        DateFormatsOverlayModel dateFormatsOverlayModel = new DateFormatsOverlayModel(column, dateInputFormatList, dateOutputFormat, reformatEntityList);
         if (!_canceled) {
-            project.history.addEntry(new HistoryEntry(historyEntryId, project, _description, parentOperation, new ReformateDateChange(columnIndex, operation, dateOutputFormat, reformatEntityList)));
+            project.history.addEntry(new HistoryEntry(historyEntryId, project, _description, parentOperation, new ReformatDateOperation.DateFormatChange(dateFormatsOverlayModel)));
             project.processManager.onDoneProcess(this);
         }
     }

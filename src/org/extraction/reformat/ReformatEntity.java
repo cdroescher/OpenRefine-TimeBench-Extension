@@ -12,22 +12,14 @@ import java.util.Map;
  */
 public class ReformatEntity {
     private int rowId;
-
-    public void setRowId(int rowId) {
-        this.rowId = rowId;
-    }
-
-    public int getRowId() {
-        return rowId;
-    }
+    private int columnId;
+    private HashMap<String, DateTime> dateTimeFormatMap;
 
     enum ReformatState{
         NOT,
         UNIQUE,
         AMBIGIOUS
     }
-
-    private HashMap<String, DateTime> dateTimeFormatMap = new HashMap<String, DateTime>();
 
     public ReformatState getState(){
         if(dateTimeFormatMap.size()==0){
@@ -48,16 +40,19 @@ public class ReformatEntity {
     }
 
     public void writeTo(final JSONWriter json) throws JSONException {
-        json.object();
-        json.key("array");
-        json.array();
+        // TODO
+    }
 
-        for(Map.Entry<String, DateTime> entry : dateTimeFormatMap.entrySet()){
-            json.value(entry.getValue());
-        }
+    public void setColumnId(int columnId) {
+        this.columnId = columnId;
+    }
 
-        json.endArray();
-        json.endObject();
+    public void setRowId(int rowId) {
+        this.rowId = rowId;
+    }
+
+    public void setDateTimeFormatMap(HashMap<String, DateTime> dateTimeFormatMap) {
+        this.dateTimeFormatMap = dateTimeFormatMap;
     }
 
     @Override

@@ -17,7 +17,6 @@ public class ReformatDateCommand extends EngineDependentCommand {
     @Override
     protected AbstractOperation createOperation(Project project, HttpServletRequest request, JSONObject engineConfig) throws Exception {
         final String columnName = request.getParameter("column");
-        final String dateInputFormatStringList = request.getParameter("inputFormats[]");
         final String dateOutputFormat = request.getParameter("outputFormat");
         Map parameterMap = request.getParameterMap();
         String[] dateInputFormatStringArray = (String[]) parameterMap.get("inputFormats[]");
