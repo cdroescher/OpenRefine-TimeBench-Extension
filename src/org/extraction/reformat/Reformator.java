@@ -4,34 +4,27 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 /**
  * Created by droescher on 01.06.15.
  */
 public class Reformator {
 
-
-    public ArrayList<ReformatEntity> reformatDateTime(String[] inputFormats, Map<Integer, String> originDateTimes) {
-        ArrayList<ReformatEntity> resultList = new ArrayList<ReformatEntity>();
-
-        for (Map.Entry<Integer, String> originDateTime : originDateTimes.entrySet()) {
-            ReformatEntity reformatEntity = new ReformatEntity();
-            reformatEntity.setRowId(originDateTime.getKey());
-            for (String inputFormat : inputFormats) {
+    public void reformatDateTime(ReformatColumn column) {
+        for (ReformatEntity entity : column.getReformatEntityList()) {
+            for (String inputFormat : column.getInputFormats()) {
                 DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern(inputFormat);
                 try {
-                    DateTime time = dateStringFormat.parseDateTime(originDateTime.getValue());
-                    reformatEntity.addReformatEntity(inputFormat, time);
+                    DateTime time;
+                    if (entity.getCell() != null) {
+                        time = dateStringFormat.parseDateTime((String) entity.getCell().value);
+                        entity.addReformatetDateTime(inputFormat, time);
+                    } else {
+                        entity.addReformatetDateTime(inputFormat, null);
+                    }
                 } catch (IllegalArgumentException ex) {
                     // nothing to do
                 }
             }
-            resultList.add(reformatEntity);
-
         }
-
-        return resultList;
     }
 }

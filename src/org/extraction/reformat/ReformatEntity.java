@@ -1,7 +1,10 @@
 package org.extraction.reformat;
 
+import com.google.refine.model.Cell;
 import org.joda.time.DateTime;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONWriter;
 
 import java.util.HashMap;
@@ -12,51 +15,88 @@ import java.util.Map;
  */
 public class ReformatEntity {
     private int rowId;
-    private int columnId;
-    private HashMap<String, DateTime> dateTimeFormatMap;
+    private HashMap<String, DateTime> dateTimeFormatMap = new HashMap<String, DateTime>();
+    private Cell cell;
 
-    enum ReformatState{
+    public ReformatEntity(Cell cell, int rowId) {
+        this.cell = cell;
+        this.rowId = rowId;
+    }
+
+    enum ReformatState {
         NOT,
         UNIQUE,
         AMBIGIOUS
     }
 
-    public ReformatState getState(){
-        if(dateTimeFormatMap.size()==0){
+    public ReformatState getState() {
+        if (dateTimeFormatMap.size() == 0) {
             return ReformatState.NOT;
         }
-        if(dateTimeFormatMap.size()==1){
+        if (dateTimeFormatMap.size() == 1) {
             return ReformatState.UNIQUE;
         }
         return ReformatState.AMBIGIOUS;
     }
 
-    public void addReformatEntity(String format, DateTime dateTime){
+    public void addReformatetDateTime(String format, DateTime dateTime) {
         dateTimeFormatMap.put(format, dateTime);
     }
 
-    public HashMap<String, DateTime> getDateTimeFormatMap(){
+    public HashMap<String, DateTime> getDateTimeFormatMap() {
         return dateTimeFormatMap;
     }
 
     public void writeTo(final JSONWriter json) throws JSONException {
-        // TODO
+        //json.array();
+        json.object();
+
+        json.key("format");
+        json.array();
+        for (Map.Entry<String, DateTime> entry : dateTimeFormatMap.entrySet()) {
+            json.value(entry.getKey());
+        }
+        json.endArray();
+
+        json.key("dateTimeValue");
+        json.array();
+        for (Map.Entry<String, DateTime> entry : dateTimeFormatMap.entrySet()) {
+            if(entry.getValue()!=null){
+                json.value(entry.getValue().getMillis());
+            }else{
+                json.value(null);
+            }
+
+        }
+        json.endArray();
+        ////json.endObject();
+
+        ////json.object();
+        json.key("rowId");
+        json.value(rowId);
+        json.endObject();
+        //json.endArray();
     }
 
-    public void setColumnId(int columnId) {
-        this.columnId = columnId;
+    public static ReformatEntity reconstruct(JSONObject reformatEntity) throws Exception {
+        int rowId = reformatEntity.getInt("rowId");
+        ReformatEntity entity = new ReformatEntity(null, rowId);
+        JSONArray formatJson = reformatEntity.getJSONArray("format");
+        JSONArray dateTimeValueJson = reformatEntity.getJSONArray("dateTimeValue");
+        for (int j = 0; j < formatJson.length(); j++) {
+            String format = formatJson.getString(j);
+            DateTime dateTime = new DateTime(dateTimeValueJson.getLong(j));
+            entity.getDateTimeFormatMap().put(format, dateTime);
+        }
+        return entity;
     }
 
-    public void setRowId(int rowId) {
-        this.rowId = rowId;
-    }
-
-    public void setDateTimeFormatMap(HashMap<String, DateTime> dateTimeFormatMap) {
-        this.dateTimeFormatMap = dateTimeFormatMap;
+    public Cell getCell() {
+        return cell;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return dateTimeFormatMap.toString();
     }
 }

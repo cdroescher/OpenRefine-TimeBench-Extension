@@ -15,42 +15,35 @@ import java.util.*;
 public class ReformateDateProcess extends LongRunningProcess implements Runnable {
     private final static Logger LOGGER = Logger.getLogger(ReformateDateProcess.class);
     private final Project project;
-    private final Column column;
-    private final String operation;
     private final AbstractOperation parentOperation;
     private final JSONObject engineConfig;
     private final long historyEntryId;
-    private String dateOutputFormat;
-    private String[] dateInputFormatList;
+    private final DateFormatsOverlayModel model;
 
 
-    protected ReformateDateProcess(Project project, Column column,
-                                   String operation, String[] dateInputFormatList, String dateOutputFormat,
+    protected ReformateDateProcess(Project project, DateFormatsOverlayModel model,
                                    AbstractOperation parentOperation, String description,
                                    JSONObject engineConfig) {
         super(description);
         this.project = project;
-        this.column = column;
-        this.operation = operation;
         this.parentOperation = parentOperation;
         this.engineConfig = engineConfig;
         this.historyEntryId = HistoryEntry.allocateID();
-        this.dateOutputFormat = dateOutputFormat;
-        this.dateInputFormatList = dateInputFormatList;
-
+        this.model = model;
     }
 
     @Override
     public void run() {
-        ArrayList<ReformatEntity> reformatEntityList = performExtraction();
-        DateFormatsOverlayModel dateFormatsOverlayModel = new DateFormatsOverlayModel(column, dateInputFormatList, dateOutputFormat, reformatEntityList);
+        performExtraction();
         if (!_canceled) {
-            project.history.addEntry(new HistoryEntry(historyEntryId, project, _description, parentOperation, new ReformatDateOperation.DateFormatChange(dateFormatsOverlayModel)));
+            project.history.addEntry(new HistoryEntry(historyEntryId, project, _description, parentOperation, new DateFormatChange(model)));
             project.processManager.onDoneProcess(this);
         }
     }
 
-    protected ArrayList<ReformatEntity> performExtraction() {
+    protected void performExtraction() {
+        ReformatColumn reformatColumn = model.getCurrentColumnToProcess();
+        Column column = reformatColumn.getOriginColumn();
 
         Map<Integer, String> origin = new HashMap<Integer, String>();
         // Count all rows
@@ -78,12 +71,10 @@ public class ReformateDateProcess extends LongRunningProcess implements Runnable
 
                 _progress = 100 * ++rowsProcessed / rowsFiltered;
             }
-            // Exit directly if the process has been cancelled
-            if (_canceled)
-                return null;
+
         }
         Reformator reformator = new Reformator();
-        return reformator.reformatDateTime(dateInputFormatList, origin);
+        reformator.reformatDateTime(reformatColumn);
     }
 
 

@@ -4,6 +4,8 @@ var logger = Packages.org.slf4j.LoggerFactory.getLogger("timebench-extension"),
 
 /* Initialize the extension. */
 function init() {
+  var RS = Packages.com.google.refine.RefineServlet;
+  RS.cacheClass(Packages.org.extraction.reformat.DateFormatChange);
   logger.info("Initializing commands");
   register("date-reformation", new org.extraction.reformat.ReformatDateCommand());
   register("decode-date-time-values", new org.extraction.reformat.DecodeDateTimeValueCommand());
