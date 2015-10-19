@@ -95,4 +95,7 @@ public class DateFormatsOverlayModel implements OverlayModel {
         return new DateFormatsOverlayModel(reformatColumn);
     }
 
+    public static DateFormatsOverlayModel load(Project project, JSONObject jsonObject) throws Exception {
+        return reconstruct(jsonObject);
+    }
 }

@@ -21,7 +21,7 @@ import java.util.*;
 
 public class DateFormatChange implements Change {
 
-    public static final String OVERLAY_MODE_PROPERTY = "dateTimeFormatModel";
+    public static final String OVERLAY_MODE_PROPERTY = "dateTimeFormatOverlayModel";
     public static final String OLD_DATE_TIME_FORMATS= "oldDateTime";
     public static final String NEW_DATE_TIME_FORMATS = "newDateTime";
     protected DateFormatsOverlayModel oldDateFormatsOverlayModel;

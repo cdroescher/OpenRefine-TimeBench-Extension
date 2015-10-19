@@ -9,7 +9,7 @@ function init() {
   logger.info("Initializing commands");
   register("date-reformation", new org.extraction.reformat.ReformatDateCommand());
   register("decode-date-time-values", new org.extraction.reformat.DecodeDateTimeValueCommand());
-  Packages.com.google.refine.model.Project.registerOverlayModel("dateTimeFormatOverlay", Packages.org.extraction.reformat.DateFormatsOverlayModel);
+  Packages.com.google.refine.model.Project.registerOverlayModel("dateTimeFormatOverlayModel", Packages.org.extraction.reformat.DateFormatsOverlayModel);
 
   logger.info("Initializing client resources");
   var resourceManager = Packages.com.google.refine.ClientSideResourceManager;
