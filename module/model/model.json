@@ -1,0 +1,305 @@
+{"id": "2256608155083", "columnModel": {
+    "columns": [
+        {
+            "cellIndex": 0,
+            "originalName": "date",
+            "name": "date"
+        },
+        {
+            "cellIndex": 1,
+            "originalName": "[date] 1",
+            "name": "[date] 1"
+        }
+    ],
+    "keyCellIndex": 0,
+    "keyColumnName": "date",
+    "columnGroups": []
+}, "recordModel": {
+    "hasRecords": false
+}, "overlayModels": {
+    "dateTimeFormatOverlayModel": {
+        "reformatetColumns": [
+            {
+                "newColumn": {
+                    "cellIndex": 1,
+                    "originalName": "[date] 1",
+                    "name": "[date] 1"
+                },
+                "originColumn": {
+                    "cellIndex": 0,
+                    "originalName": "date",
+                    "name": "date"
+                },
+                "formats": {
+                    "inputFormats": ["dd/MM/yy", "MM/dd/yy", "dd-MM-yyyy", "MM-dd-yyyy", "mm:hh:ss dd-MM-yyyy"],
+                    "outputFormat": "dd-MM-yyyy"
+                },
+                "reformatValues": [
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1435701600000, 1420585200000],
+                        "rowId": 0
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1435788000000, 1423263600000],
+                        "rowId": 1
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1430604000000, 1425510000000],
+                        "rowId": 2
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1430690400000, 1428184800000],
+                        "rowId": 3
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1430776800000, 1430776800000],
+                        "rowId": 4
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1430863200000, 1433455200000],
+                        "rowId": 5
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1430949600000, 1436047200000],
+                        "rowId": 6
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1431036000000, 1438725600000],
+                        "rowId": 7
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1431122400000, 1441404000000],
+                        "rowId": 8
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1431208800000, 1443996000000],
+                        "rowId": 9
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1431295200000, 1446678000000],
+                        "rowId": 10
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1431381600000, 1449270000000],
+                        "rowId": 11
+                    },
+                    {
+                        "format": ["dd/MM/yy"],
+                        "dateTimeValue": [1431468000000],
+                        "rowId": 12
+                    },
+                    {
+                        "format": ["dd/MM/yy"],
+                        "dateTimeValue": [1431554400000],
+                        "rowId": 13
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1420066800000, 1420066800000],
+                        "rowId": 14
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1435701600000, 1420585200000],
+                        "rowId": 15
+                    },
+                    {
+                        "format": ["MM/dd/yy"],
+                        "dateTimeValue": [1421362800000],
+                        "rowId": 16
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1435701600000, 1420585200000],
+                        "rowId": 17
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1438380000000, 1420671600000],
+                        "rowId": 18
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1438380000000, 1420671600000],
+                        "rowId": 19
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1441058400000, 1420758000000],
+                        "rowId": 20
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1443650400000, 1420844400000],
+                        "rowId": 21
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1448924400000, 1421017200000],
+                        "rowId": 22
+                    },
+                    {
+                        "format": ["MM/dd/yy"],
+                        "dateTimeValue": [1448406000000],
+                        "rowId": 23
+                    },
+                    {
+                        "format": ["MM/dd/yy"],
+                        "dateTimeValue": [1447369200000],
+                        "rowId": 24
+                    },
+                    {
+                        "format": ["dd/MM/yy", "MM/dd/yy"],
+                        "dateTimeValue": [1426028400000, 1446505200000],
+                        "rowId": 25
+                    },
+                    {
+                        "format": ["MM/dd/yy"],
+                        "dateTimeValue": [1450998000000],
+                        "rowId": 26
+                    },
+                    {
+                        "format": [],
+                        "dateTimeValue": [],
+                        "rowId": 27
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1367359200000, 1357340400000],
+                        "rowId": 28
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1367445600000, 1360018800000],
+                        "rowId": 29
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1367532000000, 1362438000000],
+                        "rowId": 30
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1367618400000, 1365112800000],
+                        "rowId": 31
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1367704800000, 1367704800000],
+                        "rowId": 32
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1367791200000, 1370383200000],
+                        "rowId": 33
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1367877600000, 1372975200000],
+                        "rowId": 34
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1367964000000, 1375653600000],
+                        "rowId": 35
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1368050400000, 1378332000000],
+                        "rowId": 36
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1368136800000, 1380924000000],
+                        "rowId": 37
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1368223200000, 1383606000000],
+                        "rowId": 38
+                    },
+                    {
+                        "format": ["dd-MM-yyyy", "MM-dd-yyyy"],
+                        "dateTimeValue": [1368309600000, 1386198000000],
+                        "rowId": 39
+                    },
+                    {
+                        "format": ["dd-MM-yyyy"],
+                        "dateTimeValue": [1368396000000],
+                        "rowId": 40
+                    },
+                    {
+                        "format": ["dd-MM-yyyy"],
+                        "dateTimeValue": [1368482400000],
+                        "rowId": 41
+                    },
+                    {
+                        "format": [],
+                        "dateTimeValue": [],
+                        "rowId": 42
+                    },
+                    {
+                        "format": [],
+                        "dateTimeValue": [],
+                        "rowId": 43
+                    },
+                    {
+                        "format": [],
+                        "dateTimeValue": [],
+                        "rowId": 44
+                    },
+                    {
+                        "format": [],
+                        "dateTimeValue": [],
+                        "rowId": 45
+                    },
+                    {
+                        "format": [],
+                        "dateTimeValue": [],
+                        "rowId": 46
+                    },
+                    {
+                        "format": [],
+                        "dateTimeValue": [],
+                        "rowId": 47
+                    },
+                    {
+                        "format": [],
+                        "dateTimeValue": [],
+                        "rowId": 48
+                    },
+                    {
+                        "format": [],
+                        "dateTimeValue": [],
+                        "rowId": 49
+                    }
+                ]
+            }
+        ]
+    }
+}, "scripting": {
+    "grel": {
+        "name": "Google Refine Expression Language (GREL)",
+        "defaultExpression": "value"
+    },
+    "jython": {
+        "name": "Jython",
+        "defaultExpression": "return value"
+    },
+    "clojure": {
+        "name": "Clojure",
+        "defaultExpression": "value"
+    }
+}}
