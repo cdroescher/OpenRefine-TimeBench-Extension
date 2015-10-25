@@ -1,5 +1,5 @@
 var logger = Packages.org.slf4j.LoggerFactory.getLogger("timebench-extension"),
-    refineServlet = Packages.com.google.refine.RefineServlet
+    refineServlet = Packages.com.google.refine.RefineServlet;
 
 
 /* Initialize the extension. */
@@ -7,8 +7,9 @@ function init() {
   var RS = Packages.com.google.refine.RefineServlet;
   RS.cacheClass(Packages.org.extraction.reformat.DateFormatChange);
   logger.info("Initializing commands");
-  register("date-reformation", new org.extraction.reformat.ReformatDateCommand());
-  register("decode-date-time-values", new org.extraction.reformat.DecodeDateTimeValueCommand());
+  register("apply-reformation", new org.extraction.reformat.ApplyReformationCommand());
+  register("get-column", new org.extraction.reformat.GetColumnCommand());
+  register("reformat-column",new org.extraction.reformat.ReformatColumnCommand());
   Packages.com.google.refine.model.Project.registerOverlayModel("dateTimeFormatOverlayModel", Packages.org.extraction.reformat.DateFormatsOverlayModel);
 
   logger.info("Initializing client resources");

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class ReformatDateCommand extends EngineDependentCommand {
+public class ApplyReformationCommand extends EngineDependentCommand {
 
 
     @Override

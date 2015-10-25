@@ -42,7 +42,7 @@ ReformatDate.prototype = {
         data["inputFormats"] = inputFormatArray;
         data["outputFormat"] = $('#outputDateFormat').val();
         data["column"] = $("#reformatDateSelect option:selected" ).text();
-        Refine.postProcess('timebench-extension', 'date-reformation', data, {},
+        Refine.postProcess('timebench-extension', 'apply-reformation', data, {},
             { rowsChanged: true, modelsChanged: true });
         this.hide();
         columnsReformat = [];
