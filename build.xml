@@ -48,12 +48,15 @@
         <pathelement path="${refine.classes.dir}"/>
     </path>
 
-    <target name="build_java">
+
+
+    <target name="build_java" depends="clean">
         <mkdir dir="${classes.dir}" />
         <javac encoding="utf-8" destdir="${classes.dir}" debug="true" includeAntRuntime="no">
             <src path="${src.dir}"/>
             <classpath refid="class.path" />
         </javac>
+        <copy file="formatList" tofile="module/MOD-INF/classes/org/extraction/reformat/formatList"/>
     </target>
 
     <target name="build" depends="build_java"/>

@@ -15,6 +15,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Scanner;
 
 /**
  * Created by Christian on 25.10.15.
@@ -43,26 +45,50 @@ public class ReformatColumnCommand extends Command {
 
             JSONWriter writer = new JSONWriter(response.getWriter());
             int cellIndex = Integer.parseInt(request.getParameter("columnIndex"));
+
+            String[] splitFormats;
             String format = request.getParameter("format");
-            int rowsTotal = project.rows.size();
+
+            if(format==null) {
+                InputStream formatList = ReformatColumnCommand.class.getResourceAsStream("formatList");
+                format = new Scanner(formatList).nextLine();
+            }
+
             writer.array();
-            for (int rowIndex = 0; rowIndex < rowsTotal; rowIndex++) {
-                Row row = project.rows.get(rowIndex);
-                Cell cell = row.getCell(cellIndex);
-
-                DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern(format);
-                try {
-                    DateTime time = dateStringFormat.parseDateTime((String) cell.value);
-                    writer.value(time.getMillis());
-                } catch (IllegalArgumentException ex) {
-                    // nothing to do
-                }
-
-                cell.write(writer, null);
+            splitFormats = format.split("@@");
+            for(String splitFormat : splitFormats){
+                writeReformatColumn(cellIndex, splitFormat, writer, project);
             }
             writer.endArray();
         } catch (JSONException e) {
             HttpUtilities.respondException(response, e);
         }
+    }
+
+    private void writeReformatColumn(int cellIndex, String format, JSONWriter writer, Project project) throws JSONException{
+        int rowsTotal = project.rows.size();
+        writer.object();
+        writer.key("columnIndex");
+        writer.value(cellIndex);
+        writer.key("format");
+        writer.value(format);
+        writer.key("reformatedColumn");
+        writer.array();
+        for (int rowIndex = 0; rowIndex < rowsTotal; rowIndex++) {
+            Row row = project.rows.get(rowIndex);
+            Cell cell = row.getCell(cellIndex);
+            DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern(format);
+            writer.object();
+            writer.key("v");
+            try {
+                DateTime time = dateStringFormat.parseDateTime((String) cell.value);
+                writer.value(dateStringFormat.print(time));
+            } catch (IllegalArgumentException ex) {
+                writer.value(null);
+            }
+            writer.endObject();
+        }
+        writer.endArray();
+        writer.endObject();
     }
 }
