@@ -2,7 +2,6 @@ package org.extraction.reformat;
 
 import com.google.refine.commands.Command;
 import com.google.refine.commands.HttpUtilities;
-import com.google.refine.expr.MetaParser;
 import com.google.refine.model.*;
 import org.json.JSONException;
 import org.json.JSONWriter;
@@ -11,8 +10,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.Properties;
 
 /**
  * Created by Christian on 25.10.15.
@@ -44,9 +41,9 @@ public class GetColumnCommand extends Command {
             int rowsTotal = project.rows.size();
             writer.array();
             for (int rowIndex = 0; rowIndex < rowsTotal; rowIndex++) {
-                    Row row = project.rows.get(rowIndex);
-                    Cell cell = row.getCell(cellIndex);
-                    cell.write(writer, null);
+                Row row = project.rows.get(rowIndex);
+                Cell cell = row.getCell(cellIndex);
+                cell.write(writer, null);
             }
             writer.endArray();
         } catch (JSONException e) {

@@ -1,0 +1,65 @@
+ul{
+    margin: 0;
+    padding: 0px;
+}
+h2 {
+    padding: 15px;
+    margin: 0;
+    background-color: lightgray;
+    border-color: black;
+    border-right-style: solid;
+    border-width: 1px;
+}
+
+li {
+    list-style-type: none;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-bottom: solid;
+    border-width: 1px;
+    border-color: lightgrey;
+}
+
+#dateValues {
+    width: 75%;
+}
+
+#dateValues ul {
+    float: left;
+}
+
+#ambigiuousValuesBox{
+    float: right;
+    margin: 50px;
+}
+
+.ambigiuousValues {
+    border-style: double;
+    padding: 20px;
+    margin-bottom: 5px;
+}
+
+.ambigiuosValue{
+    background-color: lightcoral;
+}
+
+.uniqueValue{
+    background-color: lightgreen;
+}
+
+#originValues, #resultList, #reformatedValues{
+    float: left;
+    border-style: solid;
+    border-width: thin;
+}
+
+#reformatedValues ul{
+    float: left;
+    border-right: solid;
+    border-width: thin;
+    border-color: lightgrey;
+}
+
+.activatedFormat{
+    background-color: grey;
+}
