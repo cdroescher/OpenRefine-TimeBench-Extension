@@ -77,14 +77,26 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
         $http.get('/command/timebench-extension/reformat-column?columnIndex=0&project=' + theProject.id).success(function (openRefineModel) {
             $scope.reformatedValues = openRefineModel;
             $scope.result = findAmbigiouosFormats(openRefineModel);
-            $scope.dateValues = column
-            $scope.applyValue = function($event, ambigiuosFormatValue){
-                $($event.target).attr('class','activatedFormat')
+            $scope.dateValues = column;
+            $scope.applyValue = function($event){
+                $($event.target).attr('class','activatedFormat');
                 $($event.target).siblings().each(function(){
                     if($(this).attr('class')=='activatedFormat'){
                         $(this).removeAttr('class');
                     }
                 });
+                var selectedFormat = $($event.target).text();
+                for(var i=0; i<$scope.reformatedValues.length; i++) {
+                    if($scope.reformatedValues[i].format == selectedFormat.replace(/^\s+|\s+$/g, '').trim()){
+                        for(var ii=0; ii<$scope.reformatedValues[i].reformatedColumn.length; ii++){
+                            if($scope.result.resultValues[ii] == undefined && $scope.reformatedValues[i].reformatedColumn[ii].v != null) {
+                                $scope.result.resultValues[ii] = $scope.reformatedValues[i].reformatedColumn[ii];
+                            }
+                        }
+                    }
+                }
+            }
+            $scope.applyOutputFormat = function($event){
 
             }
         });
