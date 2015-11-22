@@ -56,7 +56,7 @@
             <src path="${src.dir}"/>
             <classpath refid="class.path" />
         </javac>
-        <copy file="formatList" tofile="module/MOD-INF/classes/org/extraction/reformat/formatList"/>
+        <copy file="formatList" tofile="module/MOD-INF/classes/org/extraction/reformat/commands/formatList"/>
     </target>
 
     <target name="build" depends="build_java"/>

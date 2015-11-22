@@ -5,10 +5,15 @@ ul{
 h2 {
     padding: 15px;
     margin: 0;
-    background-color: lightgray;
-    border-color: black;
-    border-right-style: solid;
-    border-width: 1px;
+    background-color: #5bc0de;
+    font-size: medium;
+    width: 200px;
+    /*border-color: black;*/
+    /*border-right-style: solid;*/
+    /*border-width: 1px;*/
+    background-color: #5bc0de;
+    border-color: #46b8da;
+    color: #fff;
 }
 
 li {
@@ -21,7 +26,13 @@ li {
 }
 
 #dateValues {
-    width: 75%;
+    width: 100%;
+    clear: both;
+    height: 700px;
+}
+
+#pagination {
+    clear: both;
 }
 
 #dateValues ul {
@@ -34,23 +45,27 @@ li {
 }
 
 .ambigiuousValues {
-    border-style: double;
+    /*border-style: double;*/
     padding: 20px;
     margin-bottom: 5px;
 }
 
 .ambigiuosValue{
-    background-color: lightcoral;
+    background-color: rgba(197, 78, 74, 0.36);
+    border-color: #d43f3a;
+    color: #353535;
 }
 
 .uniqueValue{
-    background-color: lightgreen;
+    background-color: rgba(57, 158, 174, 0.33);
+    border-color: #46b8da;
+    color: #353535;
 }
 
 #originValues, #resultList, #reformatedValues{
     float: left;
-    border-style: solid;
-    border-width: thin;
+    /*border-style: solid;*/
+    /*border-width: thin;*/
 }
 
 #reformatedValues ul{
@@ -62,4 +77,41 @@ li {
 
 .activatedFormat{
     background-color: grey;
+}
+
+#outputFormatLabel{
+    float: left;
+}
+
+#outputFormat {
+    float: left;
+    width: 200px;
+}
+
+
+#formats {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    position: absolute;
+    top: 800px;
+    width: 400px;
+    border-style: solid;
+    border-width: thin;
+    border-color: #46b8da;
+}
+/*#inputFormatDiv {*/
+    /*padding-top: 50px;*/
+    /*padding-bottom: 50px;*/
+    /*position: absolute;*/
+    /*top: 1000px;*/
+    /*width: 400px;*/
+    /*border-style: solid;*/
+    /*border-width: thin;*/
+    /*border-color: #46b8da;*/
+/*}*/
+
+
+#inputFormats{
+    position: absolute;
+    left: 500px;
 }

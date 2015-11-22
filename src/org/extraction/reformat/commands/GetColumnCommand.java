@@ -1,4 +1,4 @@
-package org.extraction.reformat;
+package org.extraction.reformat.commands;
 
 import com.google.refine.commands.Command;
 import com.google.refine.commands.HttpUtilities;

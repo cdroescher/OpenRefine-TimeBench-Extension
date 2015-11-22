@@ -4,9 +4,15 @@
 <html lang="en" ng-app="timebenchExtension" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <script src="bower_components/jquery/dist/jquery.js"></script>
-    <!--<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">-->
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>-->
+    <!--<link rel="stylesheet"  href="bower_components/jquery-ui/themes/redmond/jquery-ui.css">-->
+    <script src="bower_components/jquery-ui/jquery-ui.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <script src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <!-- Latest compiled and minified CSS -->
+
     <link rel="stylesheet" href="css/extension.css">
     <script type="text/javascript">
         URL.getParameters = function () {
@@ -34,7 +40,7 @@
     <div id="originValues">
         <ul>
             <h2>origin</h2>
-            <li ng-repeat="dateValue in dateValues" my-repeat-directive>
+            <li ng-repeat="dateValue in filteredDateValues" my-repeat-directive>
                 {{dateValue.v}}
             </li>
         </ul>
@@ -42,7 +48,7 @@
     <div id="reformatedValues">
         <ul ng-repeat="reformatedValue in reformatedValues">
             <h2>{{reformatedValue.format}}</h2>
-            <li ng-repeat="reformatedValue1 in reformatedValue.reformatedColumn" my-repeat-directive>
+            <li ng-repeat="reformatedValue1 in reformatedValue.filteredReformatedColumn" my-repeat-directive>
                 {{reformatedValue1.v ? reformatedValue1.v : '-'}}
             </li>
         </ul>
@@ -50,11 +56,20 @@
     <div id="resultList">
         <ul>
             <h2>result</h2>
-            <li ng-repeat="value in result.resultValues track by $index" my-repeat-directive>
-                {{value.v ? value.v : '-'}}
+            <li ng-repeat="resultValue in filteredValues" my-repeat-directive>
+                {{resultValue.v ? resultValue.v : '-'}}
             </li>
         </ul>
     </div>
+
+</div>
+<div id="pagination">
+    <uib-pagination boundary-links="true" items-per-page="pagination.numPerPage" num-pages="pagination.numPages"
+                    total-items="dateValues.length" ng-model="pagination.currentPage" class="pagination-sm"
+                    max-size="10" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"
+                    ng-change="pageChanged()"></uib-pagination>
+    page: {{pagination.currentPage}}
+    total: {{Math.floor(dateValues.length/pagination.numPerPage)}}
 </div>
 <div id="ambigiuousValuesBox">
     <div ng-repeat="ambigiuosFormat in result.ambigiuosFormats" class="ambigiuousValues">
@@ -63,5 +78,33 @@
         </p>
     </div>
 </div>
+<div>
+
+</div>
+<button type="button" class="btn btn-info" ng-click="applyToDataModel()">apply to data model</button>
+
+<div id="formats">
+    <div id="outputFormatDiv">
+        <label id="outputFormatLabel" for="outputFormat">output format</label>
+        <input id="outputFormat" type="text" class="form-control">
+        <button type="button" class="btn btn-info" id="refresh" ng-disabled="inputFormat.formats.length == 0"
+                ng-click="refresh()">refresh
+        </button>
+    </div>
+    <div id="inputFormatDiv">
+        <label for="inputFormat">input format</label>
+        <input id="inputFormat" type="text" class="form-control">
+        <button type="button" class="btn btn-info" ng-click="addInputFormat()" id="addInputFormats">add input format
+        </button>
+    </div>
+</div>
+
+<div id="inputFormats">
+    <div ng-repeat="inputFormat in inputFormat.formats">
+        <p>{{inputFormat}}</p>
+        <button type="button" class="btn btn-sm btn-danger" ng-click="removeInputFormat($index)">clear</button>
+    </div>
+</div>
+
 </body>
 </html>

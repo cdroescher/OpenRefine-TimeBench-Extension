@@ -1,4 +1,4 @@
-package org.extraction.reformat;
+package org.extraction.reformat.commands;
 
 import com.google.refine.commands.Command;
 import com.google.refine.commands.HttpUtilities;
@@ -8,7 +8,9 @@ import com.google.refine.model.Row;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONWriter;
 
 import javax.servlet.ServletException;
@@ -46,16 +48,20 @@ public class ReformatColumnCommand extends Command {
             JSONWriter writer = new JSONWriter(response.getWriter());
             int cellIndex = Integer.parseInt(request.getParameter("columnIndex"));
 
-            String[] splitFormats;
-            String format = request.getParameter("format");
-
-            if(format==null) {
+            JSONObject jsonObject = new JSONObject(request.getReader().readLine());
+            JSONArray formatArray = ((JSONArray) jsonObject.get("formats"));
+            String[] splitFormats = new String[formatArray.length()];
+            for(int i=0; i < formatArray.length(); i++){
+                splitFormats[i] = formatArray.getString(i);
+            }
+            String format=null;
+            if(splitFormats.length==0) {
                 InputStream formatList = ReformatColumnCommand.class.getResourceAsStream("formatList");
                 format = new Scanner(formatList).nextLine();
+                splitFormats = format.split("@@");
             }
 
             writer.array();
-            splitFormats = format.split("@@");
             for(String splitFormat : splitFormats){
                 writeReformatColumn(cellIndex, splitFormat, writer, project);
             }
@@ -83,6 +89,8 @@ public class ReformatColumnCommand extends Command {
             try {
                 DateTime time = dateStringFormat.parseDateTime((String) cell.value);
                 writer.value(dateStringFormat.print(time));
+                writer.key("timestamp");
+                writer.value(time.getMillis());
             } catch (IllegalArgumentException ex) {
                 writer.value(null);
             }

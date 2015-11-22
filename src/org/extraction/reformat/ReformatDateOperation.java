@@ -19,15 +19,14 @@ import java.io.LineNumberReader;
 import java.io.Writer;
 import java.util.*;
 
-public class ReformatDateOperation extends EngineDependentOperation {
+public class ReformatDateOperation extends AbstractOperation {
 
 
     private final DateFormatsOverlayModel model;
     private final String column;
 
 
-    public ReformatDateOperation(DateFormatsOverlayModel model, String column, final JSONObject engineConfig) {
-        super(engineConfig);
+    public ReformatDateOperation(DateFormatsOverlayModel model, String column) {
         this.model = model;
         this.column = column;
     }
@@ -48,7 +47,7 @@ public class ReformatDateOperation extends EngineDependentOperation {
 
     @Override
     public Process createProcess(final Project project, final Properties options) throws Exception {
-        return new ReformateDateProcess(project, model, this, getBriefDescription(project), getEngineConfig());
+        return new ReformateDateProcess(project, model, this, getBriefDescription(project));
     }
 
 

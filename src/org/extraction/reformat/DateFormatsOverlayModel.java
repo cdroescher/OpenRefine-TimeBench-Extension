@@ -86,7 +86,7 @@ public class DateFormatsOverlayModel implements OverlayModel {
         }
         String outputFormat = formats.getString("outputFormat");
 
-        ReformatColumn reformatColumn = new ReformatColumn(inputFormats, outputFormat, originColumn);
+        ReformatColumn reformatColumn = new ReformatColumn( outputFormat, originColumn);
         reformatColumn.setNewColumn(newColumn);
         JSONArray reformatValues = reformatetColumns.getJSONArray("reformatValues");
         for(int i=0; i<reformatValues.length(); i++){
