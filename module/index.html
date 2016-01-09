@@ -69,7 +69,7 @@
                     max-size="10" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"
                     ng-change="pageChanged()"></uib-pagination>
     page: {{pagination.currentPage}}
-    total: {{Math.floor(dateValues.length/pagination.numPerPage)}}
+    total: {{Math.ceil(dateValues.length/pagination.numPerPage)}}
 </div>
 <div id="ambigiuousValuesBox">
     <div ng-repeat="ambigiuosFormat in result.ambigiuosFormats" class="ambigiuousValues">
