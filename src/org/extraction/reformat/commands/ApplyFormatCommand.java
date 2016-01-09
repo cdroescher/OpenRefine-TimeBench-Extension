@@ -8,6 +8,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +22,9 @@ import java.io.PrintWriter;
  * Created by Christian on 15.11.15.
  */
 public class ApplyFormatCommand extends Command {
+
+    final static Logger logger = LoggerFactory.getLogger("ApplyFormatCommand");
+
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -44,11 +49,12 @@ public class ApplyFormatCommand extends Command {
             String resultFormat = obj.getString("resultFormat");
             for (int i = 0; i < ((JSONArray) obj.get("resultValues")).length(); i++) {
                 JSONArray resultValues = (JSONArray) obj.get("resultValues");
-                if (!(((JSONObject)resultValues.get(i)).get("timestamp").getClass() ==JSONObject.NULL.getClass())) {
-                        long timestamp = ((JSONObject)resultValues.get(i)).getLong("timestamp");
-                        DateTime dateTime = new DateTime(timestamp);
-                        DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern(resultFormat);
-                        ((JSONObject)resultValues.get(i)).put("v", dateTime.toString(dateStringFormat));
+                if (!(((JSONObject) resultValues.get(i)).get("timestamp").getClass() == JSONObject.NULL.getClass())) {
+                    long timestamp = ((JSONObject) resultValues.get(i)).getLong("timestamp");
+                    DateTime dateTime = new DateTime(timestamp);
+                    logger.info("input date: "+ dateTime.toString()+", result format: " + resultFormat);
+                    DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern(resultFormat);
+                    ((JSONObject) resultValues.get(i)).put("v", dateTime.toString(dateStringFormat));
                 }
             }
 

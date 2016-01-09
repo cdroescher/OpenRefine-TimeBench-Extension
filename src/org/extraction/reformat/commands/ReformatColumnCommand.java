@@ -12,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +26,9 @@ import java.util.Scanner;
  * Created by Christian on 25.10.15.
  */
 public class ReformatColumnCommand extends Command {
+
+    final static Logger logger = LoggerFactory.getLogger("ReformatColumnCommand");
+
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -41,6 +46,8 @@ public class ReformatColumnCommand extends Command {
 
         Project project = getProject(request);
         try {
+
+            // TODO use same pattern for writer as in ApplyFormatCommand
             response.setCharacterEncoding("UTF-8");
             response.setHeader("Content-Type", "application/json");
             response.setHeader("Cache-Control", "no-cache");
@@ -55,17 +62,18 @@ public class ReformatColumnCommand extends Command {
                 splitFormats[i] = formatArray.getString(i);
             }
             String format=null;
-            if(splitFormats.length==0) {
-                InputStream formatList = ReformatColumnCommand.class.getResourceAsStream("formatList");
-                format = new Scanner(formatList).nextLine();
-                splitFormats = format.split("@@");
-            }
+//            if(splitFormats.length==0) {
+//                InputStream formatList = ReformatColumnCommand.class.getResourceAsStream("formatList");
+//                format = new Scanner(formatList).nextLine();
+//                splitFormats = format.split("@@");
+//            }
 
             writer.array();
             for(String splitFormat : splitFormats){
                 writeReformatColumn(cellIndex, splitFormat, writer, project);
             }
             writer.endArray();
+            response.flushBuffer();
         } catch (JSONException e) {
             HttpUtilities.respondException(response, e);
         }

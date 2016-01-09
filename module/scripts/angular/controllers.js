@@ -51,21 +51,23 @@ function findAmbigiouosFormats(openRefineModel) {
     var result = {};
     result.ambigiuosFormats = [];
     result.resultValues = [];
-    for (var ii = 0; ii < openRefineModel[0].reformatedColumn.length; ++ii) {
-        result.ambigiuosFormats[ii] = [];
-        for (var i = 0; i < openRefineModel.length; ++i) {
-            if (openRefineModel[i].reformatedColumn[ii].v != null) {
-                result.ambigiuosFormats[ii].push(openRefineModel[i].format)
-            }
-        }
-        result.resultValues[ii] = {v: null, timestamp: null};
-        if (result.ambigiuosFormats[ii].length < 2) {
+    if(openRefineModel.length!=0) {
+        for (var ii = 0; ii < openRefineModel[0].reformatedColumn.length; ++ii) {
+            result.ambigiuosFormats[ii] = [];
             for (var i = 0; i < openRefineModel.length; ++i) {
                 if (openRefineModel[i].reformatedColumn[ii].v != null) {
-                    result.resultValues[ii] = openRefineModel[i].reformatedColumn[ii];
+                    result.ambigiuosFormats[ii].push(openRefineModel[i].format)
                 }
             }
-            result.ambigiuosFormats.splice(ii, 1);
+            result.resultValues[ii] = {v: null, timestamp: null};
+            if (result.ambigiuosFormats[ii].length < 2) {
+                for (var i = 0; i < openRefineModel.length; ++i) {
+                    if (openRefineModel[i].reformatedColumn[ii].v != null) {
+                        result.resultValues[ii] = openRefineModel[i].reformatedColumn[ii];
+                    }
+                }
+                result.ambigiuosFormats.splice(ii, 1);
+            }
         }
     }
     result.ambigiuosFormats = cleanArrayFromDoubleValues(result.ambigiuosFormats);
@@ -76,7 +78,7 @@ function findAmbigiouosFormats(openRefineModel) {
 timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $http, $log) {
     $scope.pagination = {"maxSize": 5, "currentPage": 1, "numPerPage": 30};
     $scope.Math = window.Math;
-    var test2 = function () {
+    var pagination = function () {
         var begin = (($scope.pagination.currentPage - 1) * $scope.pagination.numPerPage);
         var end = begin + $scope.pagination.numPerPage;
         $scope.filteredDateValues = $scope.dateValues.slice(begin, end);
@@ -91,15 +93,16 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
 
     $scope.inputFormat = {'formats': []};
     $scope.removeInputFormat = function (index) {
+        console.info('remove input format');
         $scope.inputFormat.formats.splice(index, 1);
         applyInputFormat();
-        test2();
+        pagination();
     };
 
     $scope.addInputFormat = function () {
         $scope.inputFormat.formats.push($('#inputFormat').val());
         applyInputFormat();
-        test2();
+        pagination();
     };
 
     $scope.refresh = function () {
@@ -108,6 +111,7 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
 
     function applyOutputFormat() {
         $scope.result.resultFormat = $('#outputFormat').val();
+        console.info('add result format');
         $scope.result.column = 0;
         $scope.result.project = theProject.id;
         $http.post('/command/timebench-extension/apply-format', $scope.result).success(function (appliedResultFormat) {
@@ -119,9 +123,9 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
                     };
                 }
             }
-            test2();
+            pagination();
         });
-        test2();
+        pagination();
     }
 
     function addSelectedInputFormatToResultColumn(selectedFormat) {
@@ -164,6 +168,10 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
             if ($scope.result.ambigiuosFormats.length == 0) {
                 applyOutputFormat()
             }
+            $http.get('/command/timebench-extension/get-column?columnIndex=0&project=' + theProject.id).success(function (column) {
+                $scope.dateValues = column;
+                pagination();
+            });
         });
     }
 
@@ -175,12 +183,12 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
 
     $http.get('/command/timebench-extension/get-column?columnIndex=0&project=' + theProject.id).success(function (column) {
         $scope.dateValues = column;
-        test2();
+        pagination();
     });
 
     $scope.pageChanged = function () {
         $log.log('Page changed to: ' + $scope.pagination.currentPage);
-        test2();
+        pagination();
     };
 });
 
