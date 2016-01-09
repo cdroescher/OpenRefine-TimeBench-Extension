@@ -96,13 +96,11 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
         console.info('remove input format');
         $scope.inputFormat.formats.splice(index, 1);
         applyInputFormat();
-        pagination();
     };
 
     $scope.addInputFormat = function () {
         $scope.inputFormat.formats.push($('#inputFormat').val());
         applyInputFormat();
-        pagination();
     };
 
     $scope.refresh = function () {
@@ -123,7 +121,6 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
                     };
                 }
             }
-            pagination();
         });
         pagination();
     }
@@ -157,6 +154,7 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
     function applyValue($event) {
         var selectedFormat = selectFormatFromBox($event);
         addSelectedInputFormatToResultColumn(selectedFormat);
+        applyInputFormat();
         applyOutputFormat();
     }
 
@@ -168,10 +166,7 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
             if ($scope.result.ambigiuosFormats.length == 0) {
                 applyOutputFormat()
             }
-            $http.get('/command/timebench-extension/get-column?columnIndex=0&project=' + theProject.id).success(function (column) {
-                $scope.dateValues = column;
-                pagination();
-            });
+            getColumn();
         });
     }
 
@@ -181,15 +176,15 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
         });
     };
 
-    $http.get('/command/timebench-extension/get-column?columnIndex=0&project=' + theProject.id).success(function (column) {
-        $scope.dateValues = column;
-        pagination();
-    });
+    function getColumn() {
+        $http.get('/command/timebench-extension/get-column?columnIndex=0&project=' + theProject.id).success(function (column) {
+            $scope.dateValues = column;
+            pagination();
+        });
+    }
 
-    $scope.pageChanged = function () {
-        $log.log('Page changed to: ' + $scope.pagination.currentPage);
-        pagination();
-    };
+    getColumn();
+    $scope.pageChanged = pagination;
 });
 
 
