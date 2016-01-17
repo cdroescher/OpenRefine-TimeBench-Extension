@@ -2,6 +2,9 @@
 
 /* Controllers */
 
+var predefinedFormats = {
+    formats: [ 'dd-MM-yyyy', 'MM-dd-yyyy', 'dd/MM/yy', 'MM/dd/yy', 'dd/MM' ]
+};
 
 var timeBenchExtensionApp = angular.module('timebenchExtension', ['ui.bootstrap'])
     .directive('myRepeatDirective', function () {
@@ -103,6 +106,15 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
         applyInputFormat();
     };
 
+    function initPredefinedInputFormats(){
+        predefinedFormats.formats.forEach(function(entry){
+            $scope.inputFormat.formats.push(entry);
+        });
+        applyInputFormat();
+    }
+
+    initPredefinedInputFormats();
+
     $scope.refresh = function () {
         applyOutputFormat();
     };
@@ -112,7 +124,7 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
         console.info('add result format');
         $scope.result.column = 0;
         $scope.result.project = theProject.id;
-        $http.post('/command/timebench-extension/apply-format', $scope.result).success(function (appliedResultFormat) {
+        $http.post('/command/timebench-extension/apply-output-format', $scope.result).success(function (appliedResultFormat) {
             for (var i = 0; i < appliedResultFormat.resultValues.length; i++) {
                 if (appliedResultFormat.resultValues[i] != undefined) {
                     $scope.result.resultValues[i] = {
@@ -121,8 +133,8 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
                     };
                 }
             }
+            pagination();
         });
-        pagination();
     }
 
     function addSelectedInputFormatToResultColumn(selectedFormat) {
@@ -154,12 +166,12 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
     function applyValue($event) {
         var selectedFormat = selectFormatFromBox($event);
         addSelectedInputFormatToResultColumn(selectedFormat);
-        applyInputFormat();
+        //applyInputFormat();
         applyOutputFormat();
     }
 
     function applyInputFormat() {
-        $http.post('/command/timebench-extension/reformat-column?columnIndex=0&project=' + theProject.id, $scope.inputFormat).success(function (openRefineModel) {
+        $http.post('/command/timebench-extension/apply-input-format?cellIndex=' + theProject.cellIndex + '&project=' + theProject.id, $scope.inputFormat).success(function (openRefineModel) {
             $scope.result = findAmbigiouosFormats(openRefineModel);
             $scope.reformatedValues = openRefineModel;
             $scope.applyValue = applyValue;
@@ -171,13 +183,13 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
     }
 
     $scope.applyToDataModel = function () {
-        $http.post('/command/timebench-extension/apply-reformation', $scope.result).success(function () {
+        $http.post('/command/timebench-extension/apply-reformation-to-datamodel', $scope.result).success(function () {
             document.location.href = "/project?project=" + theProject.id
         });
     };
 
     function getColumn() {
-        $http.get('/command/timebench-extension/get-column?columnIndex=0&project=' + theProject.id).success(function (column) {
+        $http.get('/command/timebench-extension/get-column?project=' + theProject.id + '&cellIndex=' + theProject.cellIndex).success(function (column) {
             $scope.dateValues = column;
             pagination();
         });

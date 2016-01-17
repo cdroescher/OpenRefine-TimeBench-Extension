@@ -111,7 +111,49 @@ li {
 /*}*/
 
 
-#inputFormats{
+#inputFormatBox{
     position: absolute;
     left: 500px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    top: 800px;
+    width: 400px;
+
+}
+#inputFormats{
+    width: 100%;
+    height: 200px;
+    float: left;
+    border-style: solid;
+    border-width: thin;
+    border-color: #46b8da;
+    overflow: scroll;
+}
+
+#inputFormats .inputFormatElement p {
+    float: left;
+    width: 100%;
+    padding-left: 10px;
+
+}
+
+#inputFormats .inputFormatElement {
+    border-style: solid;
+    float: left;
+    width: 70%;
+    padding: 5px;
+}
+
+#inputFormats .inputFormatElement button {
+    float: right;
+    width: 120px;
+}
+
+#inputFormat{
+    width: 60%;
+    float: left;
+}
+
+#inputFormatDiv {
+
 }

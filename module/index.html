@@ -29,7 +29,7 @@
 
             return r;
         };
-        var theProject = {id: URL.getParameters().project};
+        var theProject = {id: URL.getParameters().project, cellIndex: URL.getParameters().cellIndex};
     </script>
 
     <script src="bower_components/angular/angular.js"></script>
@@ -91,18 +91,20 @@
                 ng-click="refresh()">refresh
         </button>
     </div>
+
+</div>
+
+<div id="inputFormatBox">
+    <div id="inputFormats">
+        <div ng-repeat="inputFormat in inputFormat.formats" class="inputFormatElement">
+            <p>{{inputFormat}}</p>
+            <button type="button" class="btn btn-sm btn-danger" ng-click="removeInputFormat($index)">clear</button>
+        </div>
+    </div>
     <div id="inputFormatDiv">
-        <label for="inputFormat">input format</label>
         <input id="inputFormat" type="text" class="form-control">
         <button type="button" class="btn btn-info" ng-click="addInputFormat()" id="addInputFormats">add input format
         </button>
-    </div>
-</div>
-
-<div id="inputFormats">
-    <div ng-repeat="inputFormat in inputFormat.formats">
-        <p>{{inputFormat}}</p>
-        <button type="button" class="btn btn-sm btn-danger" ng-click="removeInputFormat($index)">clear</button>
     </div>
 </div>
 

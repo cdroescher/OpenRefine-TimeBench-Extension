@@ -6,6 +6,8 @@ import com.google.refine.model.*;
 import org.extraction.reformat.*;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +16,10 @@ import java.io.IOException;
 import java.util.Properties;
 
 
-public class ApplyReformationCommand extends Command {
+public class ApplyReformationToDataModelCommand extends Command {
+
+    private Logger logger = LoggerFactory.getLogger(getClass().getSimpleName());
+
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)

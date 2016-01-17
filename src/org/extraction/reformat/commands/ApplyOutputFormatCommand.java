@@ -21,9 +21,9 @@ import java.io.PrintWriter;
 /**
  * Created by Christian on 15.11.15.
  */
-public class ApplyFormatCommand extends Command {
+public class ApplyOutputFormatCommand extends Command {
 
-    final static Logger logger = LoggerFactory.getLogger("ApplyFormatCommand");
+    private Logger logger = LoggerFactory.getLogger(getClass().getSimpleName());
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -52,9 +52,16 @@ public class ApplyFormatCommand extends Command {
                 if (!(((JSONObject) resultValues.get(i)).get("timestamp").getClass() == JSONObject.NULL.getClass())) {
                     long timestamp = ((JSONObject) resultValues.get(i)).getLong("timestamp");
                     DateTime dateTime = new DateTime(timestamp);
-                    logger.info("input date: "+ dateTime.toString()+", result format: " + resultFormat);
-                    DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern(resultFormat);
-                    ((JSONObject) resultValues.get(i)).put("v", dateTime.toString(dateStringFormat));
+
+                    DateTimeFormatter dateStringFormat;
+                    if(!resultFormat.isEmpty()){
+                        dateStringFormat = DateTimeFormat.forPattern(resultFormat);
+                        ((JSONObject) resultValues.get(i)).put("v", dateTime.toString(dateStringFormat));
+                        logger.info("input date: "+ dateTime.toString()+", result format: " + resultFormat + ", result: " + dateTime.toString(dateStringFormat));
+                    } else {
+                        ((JSONObject) resultValues.get(i)).put("v", "");
+                    }
+
                 }
             }
 
