@@ -40,46 +40,38 @@
     <div id="originValues">
         <ul>
             <h2>origin</h2>
-            <li ng-repeat="dateValue in filteredDateValues" my-repeat-directive>
-                {{dateValue.v}}
+            <li ng-repeat="dateValue in dataModel.originalColumn.pagination.result" ng-class="{true: 'ambigiuosValue', false: 'uniqueValue'}[dateValue.conflict==true]" >
+                {{dateValue.value}}
             </li>
         </ul>
     </div>
     <div id="reformatedValues">
-        <ul ng-repeat="reformatedValue in reformatedValues">
-            <h2>{{reformatedValue.format}}</h2>
-            <li ng-repeat="reformatedValue1 in reformatedValue.filteredReformatedColumn" my-repeat-directive>
-                {{reformatedValue1.v ? reformatedValue1.v : '-'}}
+        <ul ng-repeat="formatColumn in dataModel.formatColumns">
+            <h2 ng-click="" class="column-header" ng-click="dataModel.applyColumn(formatColumn)">{{formatColumn.format}}</h2>
+            <li ng-repeat="reformatedValue in formatColumn.pagination.result" ng-class="{true: 'ambigiuosValue', false: 'uniqueValue'}[reformatedValue.conflict==true]" >
+                {{reformatedValue.value ? reformatedValue.value : '-'}}
             </li>
         </ul>
     </div>
     <div id="resultList">
         <ul>
             <h2>result</h2>
-            <li ng-repeat="resultValue in filteredValues" my-repeat-directive>
-                {{resultValue.v ? resultValue.v : '-'}}
+            <li ng-repeat="resultValue in dataModel.resultColumn.pagination.result" ng-class="{true: 'ambigiuosValue', false: 'uniqueValue'}[resultValue.conflict==true]">
+                {{resultValue.value ? resultValue.value : '-'}}
             </li>
         </ul>
     </div>
 
 </div>
 <div id="pagination">
-    <uib-pagination boundary-links="true" items-per-page="pagination.numPerPage" num-pages="pagination.numPages"
-                    total-items="dateValues.length" ng-model="pagination.currentPage" class="pagination-sm"
-                    max-size="10" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"
-                    ng-change="pageChanged()"></uib-pagination>
-    page: {{pagination.currentPage}}
-    total: {{Math.ceil(dateValues.length/pagination.numPerPage)}}
-</div>
-<div id="ambigiuousValuesBox">
-    <div ng-repeat="ambigiuosFormat in result.ambigiuosFormats" class="ambigiuousValues">
-        <p ng-repeat="ambigiuosFormatValue in ambigiuosFormat" ng-click="applyValue($event, ambigiuosFormatValue)">
-            {{ambigiuosFormatValue}}
-        </p>
-    </div>
-</div>
-<div>
-
+    <uib-pagination
+            total-items="dataModel.originalColumn.dateTimeValues.length"
+            ng-model="dataModel.originalColumn.pagination.paginationVars.currentPage"
+            ng-change="dataModel.paginate()"
+            num-pages="dataModel.originalColumn.pagination.numPages">
+    </uib-pagination>
+    page: {{dataModel.originalColumn.pagination.paginationVars.currentPage}}
+    total: {{dataModel.originalColumn.pagination.numPages}}
 </div>
 <button type="button" class="btn btn-info" ng-click="applyToDataModel()">apply to data model</button>
 
@@ -96,14 +88,14 @@
 
 <div id="inputFormatBox">
     <div id="inputFormats">
-        <div ng-repeat="inputFormat in inputFormat.formats" class="inputFormatElement">
-            <p>{{inputFormat}}</p>
-            <button type="button" class="btn btn-sm btn-danger" ng-click="removeInputFormat($index)">clear</button>
+        <div ng-repeat="inputFormat in dataModel.formatColumns" class="inputFormatElement">
+            <p>{{inputFormat.format}}</p>
+            <button type="button" class="btn btn-sm btn-danger" ng-click="serviceMethods.removeInputFormat(inputFormat.format,dataModel)">clear</button>
         </div>
     </div>
     <div id="inputFormatDiv">
         <input id="inputFormat" type="text" class="form-control">
-        <button type="button" class="btn btn-info" ng-click="addInputFormat()" id="addInputFormats">add input format
+        <button type="button" class="btn btn-info" ng-click="serviceMethods.addInputFormat(dataModel)" id="addInputFormats">add input format
         </button>
     </div>
 </div>

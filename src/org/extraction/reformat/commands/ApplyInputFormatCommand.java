@@ -55,12 +55,7 @@ public class ApplyInputFormatCommand extends Command {
             JSONWriter writer = new JSONWriter(response.getWriter());
             int cellIndex = Integer.parseInt(request.getParameter("cellIndex"));
 
-            JSONObject jsonObject = new JSONObject(request.getReader().readLine());
-            JSONArray formatArray = ((JSONArray) jsonObject.get("formats"));
-            String[] splitFormats = new String[formatArray.length()];
-            for (int i = 0; i < formatArray.length(); i++) {
-                splitFormats[i] = formatArray.getString(i);
-            }
+            String format = request.getReader().readLine();
 
             List<String> column = extractProjectColumnToList(project, cellIndex);
 //            if (splitFormats.length == 0) {
@@ -69,7 +64,7 @@ public class ApplyInputFormatCommand extends Command {
 //                splitFormats = format.split("@@");
 //            }
 
-            Map<String, List<DateTime>> tableFormats = createMapWithFormats(column, splitFormats);
+            Map<String, List<DateTime>> tableFormats = createMapWithFormats(column, format);
             writeReformatColumn(tableFormats, writer);
             response.flushBuffer();
         } catch (JSONException e) {
@@ -106,26 +101,23 @@ public class ApplyInputFormatCommand extends Command {
         writer.endArray();
     }
 
-    private Map<String, List<DateTime>> createMapWithFormats(List<String> column, String[] formats) {
+    private Map<String, List<DateTime>> createMapWithFormats(List<String> column, String format) {
         Map<String, List<DateTime>> dateTimeMap = new HashMap<String, List<DateTime>>();
-        for (String format : formats) {
-            ArrayList<DateTime> dateTimes = new ArrayList<DateTime>();
-            DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern(format);
-            boolean allNull = true;
-            for (String field : column) {
-                try {
-                    DateTime dateTime = dateStringFormat.parseDateTime(field);
-                    dateTimes.add(dateTime);
-                    allNull = false;
-                } catch (IllegalArgumentException ex) {
-                    dateTimes.add(null);
-                }
-            }
-            if(!allNull) {
-                dateTimeMap.put(format, dateTimes);
+        ArrayList<DateTime> dateTimes = new ArrayList<DateTime>();
+        DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern(format);
+        boolean allNull = true;
+        for (String field : column) {
+            try {
+                DateTime dateTime = dateStringFormat.parseDateTime(field);
+                dateTimes.add(dateTime);
+                allNull = false;
+            } catch (IllegalArgumentException ex) {
+                dateTimes.add(null);
             }
         }
-
+        if (!allNull) {
+            dateTimeMap.put(format, dateTimes);
+        }
         return dateTimeMap;
     }
 
