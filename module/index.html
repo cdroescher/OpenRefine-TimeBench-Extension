@@ -47,7 +47,7 @@
     </div>
     <div id="reformatedValues">
         <ul ng-repeat="formatColumn in dataModel.formatColumns">
-            <h2 ng-click="" class="column-header" ng-click="dataModel.applyColumn(formatColumn)">{{formatColumn.format}}</h2>
+            <h2 ng-click="dataModel.applyColumn(formatColumn)" class="column-header" ng-class="{true: 'applied', false : ''}[formatColumn.applied]" ng-click="dataModel.applyColumn(formatColumn)">{{formatColumn.format}}</h2>
             <li ng-repeat="reformatedValue in formatColumn.pagination.result" ng-class="{true: 'ambigiuosValue', false: 'uniqueValue'}[reformatedValue.conflict==true]" >
                 {{reformatedValue.value ? reformatedValue.value : '-'}}
             </li>

@@ -24,6 +24,7 @@ function Column(format) {
     this.format = format;
     this.dateTimeValues = [];
     this.pagination = new Pagination(this.dateTimeValues, paginationVars);
+    this.applied = false;
 }
 
 function DateTimeValue(value, timeStamp, conflict) {
@@ -80,10 +81,38 @@ function DataModel(projectId, cellIndex) {
         this.resultColumn.pagination.calculate();
     };
 
-    this.applyColumn = function (column) {
-        column.forEach(function(item, index){
-            // TODO
-        });
+    this.applyColumn = function (columnToApply) {
+        if (!columnToApply.applied) {
+            columnToApply.applied = !columnToApply.applied;
+            var conflictColumns = [];
+            this.formatColumns.forEach(function (columnItem, index) {
+                var conflict = false;
+                if (columnItem != columnToApply) {
+                    columnItem.dateTimeValues.forEach(function (item, index) {
+                        if (columnToApply.dateTimeValues[index].value && item.value) {
+                            conflict = true;
+                        }
+                    });
+                }
+                if (conflict) {
+                    conflictColumns.push(columnItem);
+                    //conflictColumns.push(columnToApply);
+                }
+            });
+            conflictColumns.forEach(function (conflictItem) {
+                conflictItem.applied = false;
+            });
+            columnToApply.dateTimeValues.forEach(function (item, index) {
+                if (item.value) {
+                    this.resultColumn.dateTimeValues[index] = new DateTimeValue(item.value, item.timestamp, false);
+                }
+            }.bind(this));
+            this.paginate();
+        }
+    };
+
+    this.reformatResultColumn = function () {
+        // TODO
     }
 }
 

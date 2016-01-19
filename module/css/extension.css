@@ -158,6 +158,6 @@ li {
 
 }
 
-.column-header:hover{
+.column-header:hover, .applied{
     background-color: forestgreen;
 }
