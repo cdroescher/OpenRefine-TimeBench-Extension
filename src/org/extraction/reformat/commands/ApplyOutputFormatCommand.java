@@ -46,9 +46,9 @@ public class ApplyOutputFormatCommand extends Command {
             response.setHeader("Cache-Control", "no-cache");
 
             JSONObject obj = new JSONObject(request.getReader().readLine());
-            String resultFormat = obj.getString("resultFormat");
-            for (int i = 0; i < ((JSONArray) obj.get("resultValues")).length(); i++) {
-                JSONArray resultValues = (JSONArray) obj.get("resultValues");
+            JSONArray resultValues = obj.getJSONArray("dateTimeValues");
+            String resultFormat = obj.getString("format");
+            for (int i = 0; i < resultValues.length(); i++) {
                 if (!(((JSONObject) resultValues.get(i)).get("timestamp").getClass() == JSONObject.NULL.getClass())) {
                     long timestamp = ((JSONObject) resultValues.get(i)).getLong("timestamp");
                     DateTime dateTime = new DateTime(timestamp);
@@ -56,10 +56,10 @@ public class ApplyOutputFormatCommand extends Command {
                     DateTimeFormatter dateStringFormat;
                     if(!resultFormat.isEmpty()){
                         dateStringFormat = DateTimeFormat.forPattern(resultFormat);
-                        ((JSONObject) resultValues.get(i)).put("v", dateTime.toString(dateStringFormat));
+                        ((JSONObject) resultValues.get(i)).put("value", dateTime.toString(dateStringFormat));
                         logger.info("input date: "+ dateTime.toString()+", result format: " + resultFormat + ", result: " + dateTime.toString(dateStringFormat));
                     } else {
-                        ((JSONObject) resultValues.get(i)).put("v", "");
+                        ((JSONObject) resultValues.get(i)).put("value", "");
                     }
 
                 }

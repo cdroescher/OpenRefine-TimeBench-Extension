@@ -27,9 +27,9 @@ function Column(format) {
     this.applied = false;
 }
 
-function DateTimeValue(value, timeStamp, conflict) {
+function DateTimeValue(value, timestamp, conflict) {
     this.value = value;
-    this.timeStamp = timeStamp;
+    this.timestamp = timestamp;
     this.conflict = conflict;
 }
 
@@ -40,11 +40,16 @@ function DataModel(projectId, cellIndex) {
     this.resultColumn = new Column(null);
     this.formatColumns = [];
     this.predefinedFormats = ['dd-MM-yyyy', 'MM-dd-yyyy', 'dd/MM/yy', 'MM/dd/yy', 'dd/MM'];
+    this.inputFormatToAdd = null;
 
-    this.init = function (dataModel) {
-        this.originalColumn.dateTimeValues.forEach(function (item, index, object) {
-            dataModel.resultColumn.dateTimeValues[index] = new DateTimeValue(item.value, item.timestamp, false);
+    this.init = function (dataModel, addInputFormat) {
+        //this.originalColumn.dateTimeValues.forEach(function (item, index) {
+        //dataModel.resultColumn.dateTimeValues[index] = new DateTimeValue(item.value, item.timestamp, false);
+        dataModel.predefinedFormats.forEach(function (item) {
+            addInputFormat(dataModel, item);
         });
+        this.paginate();
+        //});
     };
 
     this.findConflicts = function () {
@@ -57,7 +62,7 @@ function DataModel(projectId, cellIndex) {
                     valueCount++;
                 }
             });
-            if (valueCount > 1) {
+            if (valueCount != 1) {
                 this.originalColumn.dateTimeValues[i].conflict = true;
                 this.resultColumn.dateTimeValues[i] = new DateTimeValue(null, null, true);
                 this.formatColumns.forEach(function (item) {
@@ -81,7 +86,7 @@ function DataModel(projectId, cellIndex) {
         this.resultColumn.pagination.calculate();
     };
 
-    this.applyColumn = function (columnToApply) {
+    this.applyColumn = function (columnToApply, reformatResultColumn) {
         if (!columnToApply.applied) {
             columnToApply.applied = !columnToApply.applied;
             var conflictColumns = [];
@@ -108,12 +113,10 @@ function DataModel(projectId, cellIndex) {
                 }
             }.bind(this));
             this.paginate();
+            reformatResultColumn(this);
         }
-    };
 
-    this.reformatResultColumn = function () {
-        // TODO
-    }
+    };
 }
 
 
@@ -127,21 +130,29 @@ function ServiceMethods(http) {
                 column.dateTimeValues.push(dateTimeValue);
             });
             dataModel.originalColumn = column;
-            dataModel.init(dataModel);
+            dataModel.init(dataModel, this.addInputFormat);
             dataModel.paginate();
-        });
+        }.bind(this))
     };
 
-    this.addInputFormat = function (dataModel) {
-        var column = new Column($('#inputFormat').val());
-        dataModel.formatColumns.push(column);
+    this.addInputFormat = function (dataModel, format) {
+        var column;
+        if (format) {
+            column = new Column(format);
+        } else {
+            column = new Column(dataModel.inputFormatToAdd);
+        }
+
         http.post('/command/timebench-extension/apply-input-format?cellIndex=' + dataModel.cellIndex + '&project=' + dataModel.projectId, column.format).success(function (dateTimeValueColumns) {
             console.log(column);
-            dateTimeValueColumns[0].reformatedColumn.forEach(function (entry) {
-                column.dateTimeValues.push(new DateTimeValue(entry.v, entry.timestamp, false));
-            });
-            dataModel.findConflicts();
-            dataModel.paginate();
+            if (dateTimeValueColumns.length > 0) {
+                dateTimeValueColumns[0].reformatedColumn.forEach(function (entry) {
+                    column.dateTimeValues.push(new DateTimeValue(entry.v, entry.timestamp, false));
+                });
+                dataModel.formatColumns.push(column);
+                dataModel.findConflicts();
+                dataModel.paginate();
+            }
         });
         console.log(dataModel);
 
@@ -156,11 +167,22 @@ function ServiceMethods(http) {
         });
         dataModel.findConflicts();
     };
+
+    this.reformatResultColumn = function (dataModel) {
+        http.post('/command/timebench-extension/apply-output-format', dataModel.resultColumn).success(function (resultColumn) {
+            var column = new Column(resultColumn.format);
+            resultColumn.dateTimeValues.forEach(function (item) {
+                column.dateTimeValues.push(new DateTimeValue(item.value, item.timestamp, false));
+            });
+            column.pagination.calculate();
+            dataModel.resultColumn = column;
+        });
+    }
 }
 
 var timeBenchExtensionApp = angular.module('timebenchExtension', ['ui.bootstrap']);
 
-timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $http, $log) {
+timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $http) {
     var dataModel = new DataModel(theProject.id, theProject.cellIndex);
     var serviceMethods = new ServiceMethods($http);
     serviceMethods.getColumn(dataModel);

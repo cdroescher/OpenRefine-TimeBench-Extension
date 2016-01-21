@@ -47,7 +47,7 @@
     </div>
     <div id="reformatedValues">
         <ul ng-repeat="formatColumn in dataModel.formatColumns">
-            <h2 ng-click="dataModel.applyColumn(formatColumn)" class="column-header" ng-class="{true: 'applied', false : ''}[formatColumn.applied]" ng-click="dataModel.applyColumn(formatColumn)">{{formatColumn.format}}</h2>
+            <h2 ng-click="dataModel.applyColumn(formatColumn, serviceMethods.reformatResultColumn)" class="column-header" ng-class="{true: 'applied', false : ''}[formatColumn.applied]" ng-click="dataModel.applyColumn(formatColumn)">{{formatColumn.format}}</h2>
             <li ng-repeat="reformatedValue in formatColumn.pagination.result" ng-class="{true: 'ambigiuosValue', false: 'uniqueValue'}[reformatedValue.conflict==true]" >
                 {{reformatedValue.value ? reformatedValue.value : '-'}}
             </li>
@@ -78,9 +78,9 @@
 <div id="formats">
     <div id="outputFormatDiv">
         <label id="outputFormatLabel" for="outputFormat">output format</label>
-        <input id="outputFormat" type="text" class="form-control">
+        <input id="outputFormat" type="text" class="form-control" ng-model="dataModel.resultColumn.format">
         <button type="button" class="btn btn-info" id="refresh" ng-disabled="inputFormat.formats.length == 0"
-                ng-click="refresh()">refresh
+                ng-click="serviceMethods.reformatResultColumn(dataModel)">refresh
         </button>
     </div>
 
@@ -94,7 +94,7 @@
         </div>
     </div>
     <div id="inputFormatDiv">
-        <input id="inputFormat" type="text" class="form-control">
+        <input id="inputFormat" type="text" class="form-control" ng-model="dataModel.inputFormatToAdd">
         <button type="button" class="btn btn-info" ng-click="serviceMethods.addInputFormat(dataModel)" id="addInputFormats">add input format
         </button>
     </div>
