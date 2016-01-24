@@ -15,6 +15,7 @@ public class ReformatEntity {
 
     public ReformatEntity(int rowId, DateTime dateTime) {
         this.rowId = rowId;
+        this.dateTime = dateTime;
     }
 
     public void writeTo(final JSONWriter json) throws JSONException {

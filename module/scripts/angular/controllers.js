@@ -39,20 +39,21 @@ function DataModel(projectId, cellIndex) {
     this.originalColumn = null;
     this.resultColumn = new Column(null);
     this.formatColumns = [];
-    this.predefinedFormats = ['dd-MM-yyyy', 'MM-dd-yyyy', 'dd/MM/yy', 'MM/dd/yy', 'dd/MM'];
+    this.predefinedFormats = ['dd-MM-yyyy', 'MM-dd-yyyy', 'dd/MM/yy', 'MM/dd/yy', 'dd/MM', 'dd.MM.yyyy hh:mm:ss', 'dd.MM.yyyy hh:mm'];
     this.inputFormatToAdd = null;
 
-    this.init = function (dataModel, addInputFormat) {
-        //this.originalColumn.dateTimeValues.forEach(function (item, index) {
-        //dataModel.resultColumn.dateTimeValues[index] = new DateTimeValue(item.value, item.timestamp, false);
+    this.init = function (dataModel, addInputFormat, scope) {
+        this.originalColumn.dateTimeValues.forEach(function (item, index) {
+            dataModel.resultColumn.dateTimeValues[index] = new DateTimeValue(null, null, true);
+        });
         dataModel.predefinedFormats.forEach(function (item) {
-            addInputFormat(dataModel, item);
+            addInputFormat(dataModel, item, scope);
         });
         this.paginate();
         //});
     };
 
-    this.findConflicts = function () {
+    this.findConflicts = function (reformatResultColumn) {
         var i;
         var valueCount;
         for (i = 0; i < this.originalColumn.dateTimeValues.length; i++) {
@@ -60,22 +61,46 @@ function DataModel(projectId, cellIndex) {
             this.formatColumns.forEach(function (item) {
                 if (item.dateTimeValues[i].value) {
                     valueCount++;
+                    if (item.applied) {
+                        this.originalColumn.dateTimeValues[i].conflict = false;
+                        this.resultColumn.dateTimeValues[i] = new DateTimeValue(item.dateTimeValues[i].value, item.dateTimeValues[i].timestamp, false);
+                        this.formatColumns.forEach(function (item) {
+                            item.dateTimeValues[i].conflict = false;
+                        });
+                    }
                 }
-            });
-            if (valueCount != 1) {
-                this.originalColumn.dateTimeValues[i].conflict = true;
-                this.resultColumn.dateTimeValues[i] = new DateTimeValue(null, null, true);
+            }.bind(this));
+
+            if (valueCount == 1) {
                 this.formatColumns.forEach(function (item) {
-                    item.dateTimeValues[i].conflict = true;
-                });
+                    if (item.dateTimeValues[i].value && !item.applied) {
+                        this.applyColumn(item, reformatResultColumn);
+                    }
+                }.bind(this));
             } else {
-                this.originalColumn.dateTimeValues[i].conflict = false;
-                this.resultColumn.dateTimeValues[i] = new DateTimeValue(this.originalColumn.dateTimeValues[i].value, this.originalColumn.dateTimeValues[i].timestamp, false);
                 this.formatColumns.forEach(function (item) {
-                    item.dateTimeValues[i].conflict = false;
-                });
+                    if (item.dateTimeValues[i].value) {
+                        item.dateTimeValues[i].conflict = true;
+                    }
+                    item.applied = false;
+                }.bind(this));
             }
+            //if (valueCount != 1) {
+            //    this.originalColumn.dateTimeValues[i].conflict = true;
+            //    this.resultColumn.dateTimeValues[i] = new DateTimeValue(null, null, true);
+            //    this.formatColumns.forEach(function (item) {
+            //        item.dateTimeValues[i].conflict = true;
+            //    });
+            //} else {
+            //    this.originalColumn.dateTimeValues[i].conflict = false;
+            //    this.resultColumn.dateTimeValues[i] = new DateTimeValue(selectedValue.value, selectedValue.timestamp, false);
+            //    this.formatColumns.forEach(function (item) {
+            //        item.dateTimeValues[i].conflict = false;
+            //    });
+            //}
         }
+        //reformatResultColumn(this);
+        this.paginate();
     };
 
     this.paginate = function () {
@@ -87,73 +112,74 @@ function DataModel(projectId, cellIndex) {
     };
 
     this.applyColumn = function (columnToApply, reformatResultColumn) {
-        if (!columnToApply.applied) {
-            columnToApply.applied = !columnToApply.applied;
-            var conflictColumns = [];
-            this.formatColumns.forEach(function (columnItem, index) {
-                var conflict = false;
-                if (columnItem != columnToApply) {
-                    columnItem.dateTimeValues.forEach(function (item, index) {
-                        if (columnToApply.dateTimeValues[index].value && item.value) {
-                            conflict = true;
-                        }
-                    });
-                }
-                if (conflict) {
-                    conflictColumns.push(columnItem);
-                    //conflictColumns.push(columnToApply);
-                }
-            });
-            conflictColumns.forEach(function (conflictItem) {
-                conflictItem.applied = false;
-            });
-            columnToApply.dateTimeValues.forEach(function (item, index) {
-                if (item.value) {
-                    this.resultColumn.dateTimeValues[index] = new DateTimeValue(item.value, item.timestamp, false);
-                }
-            }.bind(this));
-            this.paginate();
-            reformatResultColumn(this);
-        }
-
+        //if (!columnToApply.applied) {
+        columnToApply.applied = true;
+        var conflictColumns = [];
+        this.formatColumns.forEach(function (columnItem, index) {
+            var conflict = false;
+            if (columnItem != columnToApply) {
+                columnItem.dateTimeValues.forEach(function (item, index) {
+                    if (columnToApply.dateTimeValues[index].value && item.value) {
+                        conflict = true;
+                    }
+                });
+            }
+            if (conflict) {
+                conflictColumns.push(columnItem);
+                //conflictColumns.push(columnToApply);
+            }
+        });
+        conflictColumns.forEach(function (conflictItem) {
+            conflictItem.applied = false;
+        });
+        columnToApply.dateTimeValues.forEach(function (item, index) {
+            if (item.value) {
+                this.resultColumn.dateTimeValues[index] = new DateTimeValue(item.value, item.timestamp, false);
+            }
+        }.bind(this));
+        reformatResultColumn(this);
     };
-}
 
+    //};
+}
 
 function ServiceMethods(http) {
     this.http = http;
-    this.getColumn = function (dataModel) {
+    this.getColumn = function (dataModel, scope) {
         this.http.get('/command/timebench-extension/get-column?project=' + dataModel.projectId + '&cellIndex=' + dataModel.cellIndex).success(function (dateTimeValues) {
+            console.log('/command/timebench-extension/get-column?project=' + dataModel.projectId + '&cellIndex=' + dataModel.cellIndex);
             var column = new Column(null);
             dateTimeValues.forEach(function (entry) {
                 var dateTimeValue = new DateTimeValue(entry.v, null, false);
                 column.dateTimeValues.push(dateTimeValue);
             });
             dataModel.originalColumn = column;
-            dataModel.init(dataModel, this.addInputFormat);
+            dataModel.init(dataModel, this.addInputFormat.bind(this), scope);
             dataModel.paginate();
         }.bind(this))
     };
 
-    this.addInputFormat = function (dataModel, format) {
+    this.addInputFormat = function (dataModel, format, scope) {
         var column;
         if (format) {
             column = new Column(format);
         } else {
             column = new Column(dataModel.inputFormatToAdd);
         }
-
+        scope.wait=true;
         http.post('/command/timebench-extension/apply-input-format?cellIndex=' + dataModel.cellIndex + '&project=' + dataModel.projectId, column.format).success(function (dateTimeValueColumns) {
-            console.log(column);
+            console.log('/command/timebench-extension/apply-input-format?cellIndex=' + dataModel.cellIndex + '&project=' + dataModel.projectId);
             if (dateTimeValueColumns.length > 0) {
                 dateTimeValueColumns[0].reformatedColumn.forEach(function (entry) {
                     column.dateTimeValues.push(new DateTimeValue(entry.v, entry.timestamp, false));
                 });
                 dataModel.formatColumns.push(column);
-                dataModel.findConflicts();
+                dataModel.findConflicts(this.reformatResultColumn);
+                this.reformatResultColumn(dataModel);
                 dataModel.paginate();
             }
-        });
+            scope.wait=false;
+        }.bind(this));
         console.log(dataModel);
 
     };
@@ -165,17 +191,27 @@ function ServiceMethods(http) {
                 object.splice(index, 1);
             }
         });
-        dataModel.findConflicts();
+        dataModel.findConflicts(this.reformatResultColumn);
+        this.reformatResultColumn(dataModel);
+        dataModel.paginate();
     };
 
     this.reformatResultColumn = function (dataModel) {
         http.post('/command/timebench-extension/apply-output-format', dataModel.resultColumn).success(function (resultColumn) {
+            console.log('/command/timebench-extension/apply-output-format', dataModel.resultColumn);
             var column = new Column(resultColumn.format);
             resultColumn.dateTimeValues.forEach(function (item) {
                 column.dateTimeValues.push(new DateTimeValue(item.value, item.timestamp, false));
             });
-            column.pagination.calculate();
             dataModel.resultColumn = column;
+            dataModel.paginate();
+        });
+    };
+
+    this.applyToDataModel = function (dataModel) {
+        http.post('/command/timebench-extension/apply-reformation-to-datamodel?project=' + dataModel.projectId + '&cellIndex=' + dataModel.cellIndex, dataModel.resultColumn).success(function (resultColumn) {
+            console.log('/command/timebench-extension/apply-reformation-to-datamodel?project=' + dataModel.projectId);
+            window.location = '/project?project=' + theProject.id;
         });
     }
 }
@@ -183,9 +219,10 @@ function ServiceMethods(http) {
 var timeBenchExtensionApp = angular.module('timebenchExtension', ['ui.bootstrap']);
 
 timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $http) {
+
     var dataModel = new DataModel(theProject.id, theProject.cellIndex);
     var serviceMethods = new ServiceMethods($http);
-    serviceMethods.getColumn(dataModel);
+    serviceMethods.getColumn(dataModel, $scope);
     $scope.dataModel = dataModel;
     $scope.serviceMethods = serviceMethods;
 });

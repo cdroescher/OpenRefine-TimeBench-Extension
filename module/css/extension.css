@@ -79,13 +79,11 @@ li {
     background-color: grey;
 }
 
-#outputFormatLabel{
+.label{
     float: left;
-}
-
-#outputFormat {
-    float: left;
-    width: 200px;
+    color: black;
+    width: 120px;
+    font-size: 16px;
 }
 
 
@@ -118,29 +116,28 @@ li {
     padding-bottom: 5px;
     top: 800px;
     width: 400px;
-
 }
 #inputFormats{
-    width: 100%;
     height: 200px;
+    width: 420px;
     float: left;
     border-style: solid;
     border-width: thin;
     border-color: #46b8da;
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 #inputFormats .inputFormatElement p {
     float: left;
-    width: 100%;
+    width: 200px;
     padding-left: 10px;
 
 }
 
 #inputFormats .inputFormatElement {
-    border-style: solid;
     float: left;
-    width: 70%;
+    width: 400px;
     padding: 5px;
 }
 
@@ -149,9 +146,10 @@ li {
     width: 120px;
 }
 
-#inputFormat{
-    width: 60%;
+.formatField{
+    width: 200px;
     float: left;
+    margin-right: 10px;
 }
 
 #inputFormatDiv {
@@ -159,5 +157,50 @@ li {
 }
 
 .column-header:hover, .applied{
-    background-color: forestgreen;
+    background-color: rgba(57, 158, 174, 1);}
+
+.has-error{
+    background: rgba(197, 78, 74, 0.36);
 }
+
+#explanation{
+    height: auto;
+    background-color: rgba(57, 158, 174, 0.33);
+    position: absolute;
+    width: 500px;
+    top: 200px;
+}
+#outputFormatDiv{
+    position: absolute;
+    width: 500px;
+    top: 870px;
+}
+
+.tooltip-inner {
+    color: black;
+    background: rgba(57, 158, 174, 0.33);
+}
+
+.tooltip.top .tooltip-arrow {
+    border-top-color: rgba(57, 158, 174, 0.33);
+}
+
+#outputFormatDiv2{
+margin-bottom: 10px;
+}
+
+#inputFormatDiv{
+
+}
+
+#applyToDataModelBtn{
+    top: 130px;
+    position: absolute;
+    left: 120px;
+    width: 200px;
+}
+
+#refreshBtn{
+    width: 130px;
+}
+

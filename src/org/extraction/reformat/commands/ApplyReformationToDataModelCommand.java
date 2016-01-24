@@ -4,6 +4,7 @@ import com.google.refine.ProjectManager;
 import com.google.refine.commands.Command;
 import com.google.refine.model.*;
 import org.extraction.reformat.*;
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -32,20 +33,28 @@ public class ApplyReformationToDataModelCommand extends Command {
     }
 
     protected void internalRespond(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        long projectId = Long.parseLong(request.getParameter("project"));
+        int cellIndex = Integer.parseInt(request.getParameter("cellIndex"));
+
         JSONObject obj = new JSONObject(request.getReader().readLine());
-        long projectId = obj.getLong("project");
-        int columnIndex = obj.getInt("column");
-        String outputFormat = obj.getString("resultFormat");
+
+
+        String outputFormat = obj.getString("format");
         Project project = ProjectManager.singleton.getProject(projectId);
 
         DateFormatsOverlayModel overlayModel = (DateFormatsOverlayModel) project.overlayModels.get(DateFormatChange.OVERLAY_MODE_PROPERTY);
 
-        final Column column = project.columnModel.getColumnByCellIndex(columnIndex);
+        final Column column = project.columnModel.getColumnByCellIndex(cellIndex);
         ReformatColumn reformatColumn = new ReformatColumn(outputFormat, column);
 
         int rowSize = project.rows.size();
+        DateTime dateTime = null;
         for (int i = 0; i < rowSize; i++) {
-            reformatColumn.addReformatEntity(new ReformatEntity(i, null));
+            if (!obj.getJSONArray("dateTimeValues").getJSONObject(i).getString("timestamp").equals("null")) {
+                dateTime =  new DateTime(Long.parseLong(obj.getJSONArray("dateTimeValues").getJSONObject(i).getString("timestamp")));
+            }
+            reformatColumn.addReformatEntity(new ReformatEntity(i, dateTime));
         }
 
         if (overlayModel != null) {

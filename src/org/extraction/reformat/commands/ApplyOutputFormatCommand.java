@@ -52,16 +52,15 @@ public class ApplyOutputFormatCommand extends Command {
                 if (!(((JSONObject) resultValues.get(i)).get("timestamp").getClass() == JSONObject.NULL.getClass())) {
                     long timestamp = ((JSONObject) resultValues.get(i)).getLong("timestamp");
                     DateTime dateTime = new DateTime(timestamp);
-
                     DateTimeFormatter dateStringFormat;
-                    if(!resultFormat.isEmpty()){
+                    if (!resultFormat.equals("null")) {
                         dateStringFormat = DateTimeFormat.forPattern(resultFormat);
                         ((JSONObject) resultValues.get(i)).put("value", dateTime.toString(dateStringFormat));
-                        logger.info("input date: "+ dateTime.toString()+", result format: " + resultFormat + ", result: " + dateTime.toString(dateStringFormat));
+                        ((JSONObject) resultValues.get(i)).put("timestamp", dateTime.getMillis());
+                        logger.info("input date: " + dateTime.toString() + ", result format: " + resultFormat + ", result: " + dateTime.toString(dateStringFormat));
                     } else {
                         ((JSONObject) resultValues.get(i)).put("value", "");
                     }
-
                 }
             }
 

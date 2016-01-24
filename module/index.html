@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" >
-<html lang="en" ng-app="timebenchExtension" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" ng-app="timebenchExtension" xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
 <head>
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <!--<link rel="stylesheet"  href="bower_components/jquery-ui/themes/redmond/jquery-ui.css">-->
@@ -36,69 +36,235 @@
     <script src="scripts/angular/controllers.js"></script>
 </head>
 <body ng-controller="timebenchExtensionCtrl">
-<div id="dateValues">
-    <div id="originValues">
-        <ul>
-            <h2>origin</h2>
-            <li ng-repeat="dateValue in dataModel.originalColumn.pagination.result" ng-class="{true: 'ambigiuosValue', false: 'uniqueValue'}[dateValue.conflict==true]" >
-                {{dateValue.value}}
-            </li>
-        </ul>
-    </div>
-    <div id="reformatedValues">
-        <ul ng-repeat="formatColumn in dataModel.formatColumns">
-            <h2 ng-click="dataModel.applyColumn(formatColumn, serviceMethods.reformatResultColumn)" class="column-header" ng-class="{true: 'applied', false : ''}[formatColumn.applied]" ng-click="dataModel.applyColumn(formatColumn)">{{formatColumn.format}}</h2>
-            <li ng-repeat="reformatedValue in formatColumn.pagination.result" ng-class="{true: 'ambigiuosValue', false: 'uniqueValue'}[reformatedValue.conflict==true]" >
-                {{reformatedValue.value ? reformatedValue.value : '-'}}
-            </li>
-        </ul>
-    </div>
-    <div id="resultList">
-        <ul>
-            <h2>result</h2>
-            <li ng-repeat="resultValue in dataModel.resultColumn.pagination.result" ng-class="{true: 'ambigiuosValue', false: 'uniqueValue'}[resultValue.conflict==true]">
-                {{resultValue.value ? resultValue.value : '-'}}
-            </li>
-        </ul>
-    </div>
+<uib-tabset>
+    <uib-tab heading="merge columns">
+        <div id="dateValues">
+            <div id="originValues">
+                <ul>
+                    <h2>origin</h2>
+                    <li ng-repeat="dateValue in dataModel.originalColumn.pagination.result"
+                        ng-class="{true: 'ambigiuosValue', false: 'uniqueValue'}[dateValue.conflict==true]">
+                        {{dateValue.value}}
+                    </li>
+                </ul>
+            </div>
+            <div id="reformatedValues">
+                <ul ng-repeat="formatColumn in dataModel.formatColumns">
+                    <h2 ng-click="dataModel.applyColumn(formatColumn, serviceMethods.reformatResultColumn)"
+                        class="column-header" ng-class="{true: 'applied', false : ''}[formatColumn.applied]"
+                        ng-click="dataModel.applyColumn(formatColumn)">{{formatColumn.format}}</h2>
+                    <li ng-repeat="reformatedValue in formatColumn.pagination.result"
+                        ng-class="{true: 'ambigiuosValue', false: 'uniqueValue'}[reformatedValue.conflict==true]">
+                        {{reformatedValue.value ? reformatedValue.value : '-'}}
+                    </li>
+                </ul>
+            </div>
+            <div id="resultList">
+                <ul>
+                    <h2>result</h2>
+                    <li ng-repeat="resultValue in dataModel.resultColumn.pagination.result"
+                        ng-class="{true: 'ambigiuosValue', false: 'uniqueValue'}[resultValue.conflict==true]">
+                        {{resultValue.value ? resultValue.value : '-'}}
+                    </li>
+                </ul>
+            </div>
 
-</div>
-<div id="pagination">
-    <uib-pagination
-            total-items="dataModel.originalColumn.dateTimeValues.length"
-            ng-model="dataModel.originalColumn.pagination.paginationVars.currentPage"
-            ng-change="dataModel.paginate()"
-            num-pages="dataModel.originalColumn.pagination.numPages">
-    </uib-pagination>
-    page: {{dataModel.originalColumn.pagination.paginationVars.currentPage}}
-    total: {{dataModel.originalColumn.pagination.numPages}}
-</div>
-<button type="button" class="btn btn-info" ng-click="applyToDataModel()">apply to data model</button>
-
-<div id="formats">
-    <div id="outputFormatDiv">
-        <label id="outputFormatLabel" for="outputFormat">output format</label>
-        <input id="outputFormat" type="text" class="form-control" ng-model="dataModel.resultColumn.format">
-        <button type="button" class="btn btn-info" id="refresh" ng-disabled="inputFormat.formats.length == 0"
-                ng-click="serviceMethods.reformatResultColumn(dataModel)">refresh
-        </button>
-    </div>
-
-</div>
-
-<div id="inputFormatBox">
-    <div id="inputFormats">
-        <div ng-repeat="inputFormat in dataModel.formatColumns" class="inputFormatElement">
-            <p>{{inputFormat.format}}</p>
-            <button type="button" class="btn btn-sm btn-danger" ng-click="serviceMethods.removeInputFormat(inputFormat.format,dataModel)">clear</button>
         </div>
-    </div>
-    <div id="inputFormatDiv">
-        <input id="inputFormat" type="text" class="form-control" ng-model="dataModel.inputFormatToAdd">
-        <button type="button" class="btn btn-info" ng-click="serviceMethods.addInputFormat(dataModel)" id="addInputFormats">add input format
-        </button>
-    </div>
-</div>
+        <div id="pagination">
+            <uib-pagination
+                    total-items="dataModel.originalColumn.dateTimeValues.length"
+                    ng-model="dataModel.originalColumn.pagination.paginationVars.currentPage"
+                    ng-change="dataModel.paginate()"
+                    boundary-links="true"
+                    force-ellipses="true"
+                    max-size="5">
+            </uib-pagination>
+            page: {{dataModel.originalColumn.pagination.paginationVars.currentPage}}
+            total: {{dataModel.originalColumn.pagination.numPages}}
+        </div>
+
+
+
+        <div id="outputFormatDiv">
+
+            <div id="outputFormatDiv2">
+                <label class="label" for="outputFormat">result format</label>
+                <input
+                        id="outputFormat"
+                        type="text"
+                        class="form-control formatField"
+                        ng-model="dataModel.resultColumn.format"
+                        ng-class="{'has-error' : !dataModel.resultColumn.format}"
+                        uib-tooltip="enter date-time-format for result column"
+                        tooltip-trigger="none"
+                        tooltip-is-open="!dataModel.resultColumn.format">
+                <button id="refreshBtn" type="button" class="btn btn-info" id="refresh" ng-disabled="!dataModel.resultColumn.format"
+                        ng-click="serviceMethods.reformatResultColumn(dataModel)">refresh
+                </button>
+            </div>
+            <div id="inputFormatDiv">
+                <label class="label" for="inputFormat">input format</label>
+                <input
+                        id="inputFormat"
+                        type="text"
+                        class="form-control formatField"
+                        ng-model="dataModel.inputFormatToAdd"
+                        ng-class="{'has-error' : !dataModel.inputFormatToAdd}"
+                        uib-tooltip="enter date-time-format to add column"
+                        tooltip-trigger="none"
+                        tooltip-is-open="!dataModel.inputFormatToAdd"
+                        tooltip-placement="bottom">
+                <button type="button" class="btn btn-info" ng-disabled="!dataModel.inputFormatToAdd"
+                        ng-click="serviceMethods.addInputFormat(dataModel)" id="addInputFormats">add input format
+                </button>
+            </div>
+            <button type="button" id="applyToDataModelBtn" class="btn btn-info" ng-disabled="!dataModel.resultColumn.format" ng-click="serviceMethods.applyToDataModel(dataModel)">apply to data model
+            </button>
+
+            <table id="explanation">
+                <tr>
+                    <th>Symbol</th>
+                    <th>Meaning</th>
+                    <th>Presentation</th>
+                    <th>Examples</th>
+                </tr>
+                <tr>
+                    <td>G</td>
+                    <td>era</td>
+                    <td>text</td>
+                    <td>AD</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>century of era (>=0)</td>
+                    <td>number</td>
+                    <td>20</td>
+                </tr>
+                <tr>
+                    <td>Y</td>
+                    <td>year of era (>=0)</td>
+                    <td>year</td>
+                    <td>1996</td>
+                </tr>
+                <tr>
+                    <td>x</td>
+                    <td>weekyear</td>
+                    <td>year</td>
+                    <td>1996</td>
+                </tr>
+                <tr>
+                    <td>w</td>
+                    <td>week of weekyear</td>
+                    <td>number</td>
+                    <td>27</td>
+                </tr>
+                <tr>
+                    <td>e</td>
+                    <td>day of week</td>
+                    <td>number</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>day of week</td>
+                    <td>text</td>
+                    <td>Tuesday; Tue</td>
+                </tr>
+                <tr>
+                    <td>y</td>
+                    <td>year</td>
+                    <td>year</td>
+                    <td>1996</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>day of year</td>
+                    <td>number</td>
+                    <td>189</td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>month of year</td>
+                    <td>month</td>
+                    <td>July; Jul; 07</td>
+                </tr>
+                <tr>
+                    <td>d</td>
+                    <td>day of month</td>
+                    <td>number</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td>a</td>
+                    <td>halfday of day</td>
+                    <td>text</td>
+                    <td>PM</td>
+                </tr>
+                <tr>
+                    <td>K</td>
+                    <td>hour of halfday (0~11)</td>
+                    <td>number</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>h</td>
+                    <td>clockhour of halfday (1~12)</td>
+                    <td>number</td>
+                    <td>12</td>
+                </tr>
+                <tr>
+                    <td>H</td>
+                    <td>hour of day (0~23)</td>
+                    <td>number</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>k</td>
+                    <td>clockhour of day (1~24)</td>
+                    <td>number</td>
+                    <td>24</td>
+                </tr>
+                <tr>
+                    <td>m</td>
+                    <td>minute of hour</td>
+                    <td>number</td>
+                    <td>30</td>
+                </tr>
+                <tr>
+                    <td>s</td>
+                    <td>second of minute</td>
+                    <td>number</td>
+                    <td>55</td>
+                </tr>
+                <tr>
+                    <td>S</td>
+                    <td>fraction of second</td>
+                    <td>millis</td>
+                    <td>978</td>
+                </tr>
+            </table>
+
+        </div>
+
+        <div id="inputFormatBox">
+            <div id="inputFormats">
+                <div ng-repeat="inputFormat in dataModel.formatColumns" class="inputFormatElement">
+                    <p>{{inputFormat.format}}</p>
+                    <button type="button" class="btn btn-sm btn-danger"
+                            ng-click="serviceMethods.removeInputFormat(inputFormat.format,dataModel)">clear
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </uib-tab>
+    <uib-tab heading="visualisation">
+
+    </uib-tab>
+</uib-tabset>
+
+
+
 
 </body>
 </html>
