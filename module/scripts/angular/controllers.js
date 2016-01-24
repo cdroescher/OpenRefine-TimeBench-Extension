@@ -50,14 +50,13 @@ function DataModel(projectId, cellIndex) {
             addInputFormat(dataModel, item, scope);
         });
         this.paginate();
-        //});
     };
 
     this.findConflicts = function (reformatResultColumn) {
         var i;
-        var valueCount;
+        var valueCountList = [];
         for (i = 0; i < this.originalColumn.dateTimeValues.length; i++) {
-            valueCount = 0;
+            var valueCount = 0;
             this.formatColumns.forEach(function (item) {
                 if (item.dateTimeValues[i].value) {
                     valueCount++;
@@ -70,38 +69,21 @@ function DataModel(projectId, cellIndex) {
                     }
                 }
             }.bind(this));
+            valueCountList.push(valueCount);
 
-            if (valueCount == 1) {
-                this.formatColumns.forEach(function (item) {
-                    if (item.dateTimeValues[i].value && !item.applied) {
-                        this.applyColumn(item, reformatResultColumn);
-                    }
-                }.bind(this));
-            } else {
+            if (valueCount > 1) {
                 this.formatColumns.forEach(function (item) {
                     if (item.dateTimeValues[i].value) {
                         item.dateTimeValues[i].conflict = true;
                     }
-                    item.applied = false;
                 }.bind(this));
             }
-            //if (valueCount != 1) {
-            //    this.originalColumn.dateTimeValues[i].conflict = true;
-            //    this.resultColumn.dateTimeValues[i] = new DateTimeValue(null, null, true);
-            //    this.formatColumns.forEach(function (item) {
-            //        item.dateTimeValues[i].conflict = true;
-            //    });
-            //} else {
-            //    this.originalColumn.dateTimeValues[i].conflict = false;
-            //    this.resultColumn.dateTimeValues[i] = new DateTimeValue(selectedValue.value, selectedValue.timestamp, false);
-            //    this.formatColumns.forEach(function (item) {
-            //        item.dateTimeValues[i].conflict = false;
-            //    });
-            //}
+
         }
-        //reformatResultColumn(this);
+        reformatResultColumn(this);
         this.paginate();
     };
+
 
     this.paginate = function () {
         this.formatColumns.forEach(function (item) {
@@ -139,8 +121,6 @@ function DataModel(projectId, cellIndex) {
         }.bind(this));
         reformatResultColumn(this);
     };
-
-    //};
 }
 
 function ServiceMethods(http) {
@@ -166,7 +146,6 @@ function ServiceMethods(http) {
         } else {
             column = new Column(dataModel.inputFormatToAdd);
         }
-        scope.wait=true;
         http.post('/command/timebench-extension/apply-input-format?cellIndex=' + dataModel.cellIndex + '&project=' + dataModel.projectId, column.format).success(function (dateTimeValueColumns) {
             console.log('/command/timebench-extension/apply-input-format?cellIndex=' + dataModel.cellIndex + '&project=' + dataModel.projectId);
             if (dateTimeValueColumns.length > 0) {
@@ -178,10 +157,8 @@ function ServiceMethods(http) {
                 this.reformatResultColumn(dataModel);
                 dataModel.paginate();
             }
-            scope.wait=false;
         }.bind(this));
         console.log(dataModel);
-
     };
 
     this.removeInputFormat = function (format, dataModel) {
@@ -193,6 +170,17 @@ function ServiceMethods(http) {
         });
         dataModel.findConflicts(this.reformatResultColumn);
         this.reformatResultColumn(dataModel);
+        for (var i = 0; i < dataModel.resultColumn.dateTimeValues.length; i++) {
+            var valueCount = 0;
+            dataModel.formatColumns.forEach(function (item) {
+                if (item.dateTimeValues[i].value) {
+                    valueCount++;
+                }
+            });
+            if (valueCount < 1) {
+                dataModel.resultColumn.dateTimeValues[i] = new DateTimeValue(null, null, false);
+            }
+        }
         dataModel.paginate();
     };
 
