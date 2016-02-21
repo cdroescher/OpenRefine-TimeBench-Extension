@@ -204,6 +204,101 @@ function ServiceMethods(http) {
     }
 }
 
+function HeatMap(dataModel){
+    this.dataModel = dataModel;
+    this.rect = null;
+    this.svg = null;
+    this.color = null;
+    this.percent = null;
+    this.format = null;
+    this.width = 960;
+    this.height = 136;
+    this.cellSize = 17;
+    this.heatmapData = [
+        {day: '1990-01-01', count: 0.01},
+        {day: '1990-08-21', count: 0.023},
+        {day: '1990-07-21', count: -0.04}
+    ];
+
+    this.init = function(){
+        this.percent = d3.format(".1%");
+        this.format = d3.time.format("%Y-%m-%d");
+
+        this.color = d3.scale.quantize()
+            .domain([-.05, .05])
+            .range(d3.range(11).map(function(d) { return "q" + d + "-11"; }));
+
+        this.svg = d3.select("#heatmap").selectAll("svg")
+            .data(d3.range(1990, 1991))
+            .enter().append("svg")
+            .attr("width", this.width)
+            .attr("height", this.height)
+            .attr("class", "RdYlGn")
+            .append("g")
+            .attr("transform", "translate(" + ((this.width - this.cellSize * 53) / 2) + "," + (this.height - this.cellSize * 7 - 1) + ")");
+
+        this.svg.append("text")
+            .attr("transform", "translate(-6," + this.cellSize * 3.5 + ")rotate(-90)")
+            .style("text-anchor", "middle")
+            .text(function(d) { return d; });
+
+        this.rect = this.svg.selectAll(".day")
+            .data(function(d) { return d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
+            .enter().append("rect")
+            .attr("class", "day")
+            .attr("width", this.cellSize)
+            .attr("height", this.cellSize)
+            .attr("x", function(d) { return d3.time.weekOfYear(d) * this.cellSize;}.bind(this))
+            .attr("y", function(d) { return d.getDay() * this.cellSize; }.bind(this))
+            .datum(this.format);
+
+        this.rect.append("title")
+            .text(function(d) { return d; });
+
+        this.svg.selectAll(".month")
+            .data(function(d) { return d3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
+            .enter().append("path")
+            .attr("class", "month")
+            .attr("d", this.monthPath.bind(this));
+
+        this.rect.filter(this.filterFunction.bind(this))
+            .attr("class", this.getColor.bind(this))
+            .select("title");
+    };
+
+
+    this.getColor = function(d){
+        var value=0;
+        this.heatmapData.forEach(function(element){
+            if(element.day==d){
+                value=element.count;
+            }
+        });
+        return "day " + this.color(value);
+    };
+
+    this.filterFunction = function(d){
+        var contains=false;
+        this.heatmapData.forEach(function(element){
+            if(d==element.day){
+                contains=true;
+            }
+        });
+        return contains;
+    };
+
+    this.monthPath = function (t0) {
+        var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),
+            d0 = t0.getDay(), w0 = d3.time.weekOfYear(t0),
+            d1 = t1.getDay(), w1 = d3.time.weekOfYear(t1);
+        return "M" + (w0 + 1) * this.cellSize + "," + d0 * this.cellSize
+            + "H" + w0 * this.cellSize + "V" + 7 * this.cellSize
+            + "H" + w1 * this.cellSize + "V" + (d1 + 1) * this.cellSize
+            + "H" + (w1 + 1) * this.cellSize + "V" + 0
+            + "H" + (w0 + 1) * this.cellSize + "Z";
+    }
+}
+
 var timeBenchExtensionApp = angular.module('timebenchExtension', ['ui.bootstrap']);
 
 timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $http) {
@@ -213,6 +308,8 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
     serviceMethods.getColumn(dataModel, $scope);
     $scope.dataModel = dataModel;
     $scope.serviceMethods = serviceMethods;
+    var heatMap = new HeatMap(dataModel)
+    $scope.heatMap = heatMap;
 });
 
 

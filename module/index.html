@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
     <script src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/d3/d3.js"></script>
     <!-- Latest compiled and minified CSS -->
 
     <link rel="stylesheet" href="css/extension.css">
@@ -258,7 +259,8 @@
 
         </div>
     </uib-tab>
-    <uib-tab heading="visualisation">
+    <uib-tab heading="visualisation" ng-click="heatMap.init()">
+        <div id="heatmap"></div>
 
     </uib-tab>
 </uib-tabset>
