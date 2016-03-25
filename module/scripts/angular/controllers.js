@@ -201,10 +201,18 @@ function ServiceMethods(http) {
             console.log('/command/timebench-extension/apply-reformation-to-datamodel?project=' + dataModel.projectId);
             window.location = '/project?project=' + theProject.id;
         });
-    }
+    };
+
+    this.addHeatMaps = function (dataModel, heatMapList) {
+        dataModel.formatColumns.forEach(function (e, i) {
+            var heatMap = new HeatMap(dataModel, "#heatmap" + i);
+            heatMap.init();
+            heatMapList.push(heatMap);
+        });
+    };
 }
 
-function HeatMap(dataModel) {
+function HeatMap(dataModel, id) {
     this.dataModel = dataModel;
     this.rect = null;
     this.svg = null;
@@ -218,6 +226,7 @@ function HeatMap(dataModel) {
     this.yearRange = [];
     this.maxYear = null;
     this.minYear = null;
+    this.id = id;
 
     this.init = function () {
         this.prepareDataForHeatmap();
@@ -227,9 +236,8 @@ function HeatMap(dataModel) {
                 return "q" + d + "-11";
             }));
 
-        this.svg = d3.select("#heatmap").selectAll("svg")
-            // TODO get range
-            .data(d3.range(this.minYear, this.maxYear+1))
+        this.svg = d3.select(this.id).selectAll("svg")
+            .data(d3.range(this.minYear, this.maxYear + 1))
             .enter().append("svg")
             .attr("width", this.width)
             .attr("height", this.height)
@@ -260,6 +268,25 @@ function HeatMap(dataModel) {
             }.bind(this))
             .datum(this.format);
 
+        for (var i = this.minYear; i <= this.maxYear; i++) {
+            var exists = false;
+            this.heatmapData.forEach(function (e) {
+                if (this.format.parse(e.day).getFullYear() === i) {
+                    exists = true;
+                }
+
+            }.bind(this));
+            if (!exists) {
+                var svg = $("svg");
+                for (var j = 0; j < svg.length; j++) {
+                    if (svg[j].__data__ === i) {
+                        svg[j].remove();
+                    }
+                }
+            }
+        }
+
+
         this.rect.append("title")
             .text(function (d) {
                 return d;
@@ -289,10 +316,9 @@ function HeatMap(dataModel) {
                 }
             }.bind(this));
         }.bind(this));
-        this.maxYear = Math.max.apply( Math, years );
-        this.minYear = Math.min.apply( Math, years );
+        this.maxYear = Math.max.apply(Math, years);
+        this.minYear = Math.min.apply(Math, years);
     };
-
 
     this.getColor = function (d) {
         var value = 0;
@@ -335,8 +361,8 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
     serviceMethods.getColumn(dataModel, $scope);
     $scope.dataModel = dataModel;
     $scope.serviceMethods = serviceMethods;
-    var heatMap = new HeatMap(dataModel)
-    $scope.heatMap = heatMap;
+    $scope.heatMapList = [];
+
 });
 
 

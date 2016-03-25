@@ -259,9 +259,9 @@
 
         </div>
     </uib-tab>
-    <uib-tab heading="visualisation" ng-click="heatMap.init()">
-        <div id="heatmap"></div>
-
+    <uib-tab heading="visualisation" ng-click="serviceMethods.addHeatMaps(dataModel, heatMapList)">
+        <div ng-repeat="inputFormat in dataModel.formatColumns" class="heatmap" id="heatmap{{$index}}">
+        </div>
     </uib-tab>
 </uib-tabset>
 

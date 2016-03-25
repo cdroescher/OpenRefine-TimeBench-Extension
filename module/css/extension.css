@@ -215,6 +215,10 @@ margin-bottom: 10px;
     stroke-width: 2px;
 }
 
+.heatmap{
+    border: solid;
+}
+
 .RdYlGn .q0-11{fill:rgb(165,0,38)}
 .RdYlGn .q1-11{fill:rgb(215,48,39)}
 .RdYlGn .q2-11{fill:rgb(244,109,67)}
