@@ -205,15 +205,15 @@ function ServiceMethods(http) {
 
     this.addHeatMaps = function (dataModel, heatMapList) {
         dataModel.formatColumns.forEach(function (e, i) {
-            var heatMap = new HeatMap(dataModel, "#heatmap" + i);
+            var heatMap = new HeatMap(e, "#heatmap" + i);
             heatMap.init();
             heatMapList.push(heatMap);
         });
     };
 }
 
-function HeatMap(dataModel, id) {
-    this.dataModel = dataModel;
+function HeatMap(formatColumn, id) {
+    this.formatColumn = formatColumn;
     this.rect = null;
     this.svg = null;
     this.color = null;
@@ -307,15 +307,14 @@ function HeatMap(dataModel, id) {
 
     this.prepareDataForHeatmap = function () {
         var years = [];
-        this.dataModel.formatColumns.forEach(function (d) {
-            d.dateTimeValues.forEach(function (element) {
-                if (element.timestamp) {
-                    var date = new Date(Number(element.timestamp));
-                    years.push(date.getFullYear());
-                    this.heatmapData.push({day: this.format(date), count: 0.01});
-                }
-            }.bind(this));
+        this.formatColumn.dateTimeValues.forEach(function (element) {
+            if (element.timestamp) {
+                var date = new Date(Number(element.timestamp));
+                years.push(date.getFullYear());
+                this.heatmapData.push({day: this.format(date), count: 0.01});
+            }
         }.bind(this));
+
         this.maxYear = Math.max.apply(Math, years);
         this.minYear = Math.min.apply(Math, years);
     };
