@@ -250,7 +250,12 @@ function HeatMap(formatColumn, id) {
             .style("text-anchor", "middle")
             .text(function (d) {
                 return d;
-            });
+            }.bind(this));
+
+        this.svg.append("text")
+            .text(function (d) {
+                return this.heatmapData.format;
+            }.bind(this));
 
         this.rect = this.svg.selectAll(".day")
             .data(function (d) {
@@ -307,6 +312,7 @@ function HeatMap(formatColumn, id) {
 
     this.prepareDataForHeatmap = function () {
         var years = [];
+        this.heatmapData.format=this.formatColumn.format;
         this.formatColumn.dateTimeValues.forEach(function (element) {
             if (element.timestamp) {
                 var date = new Date(Number(element.timestamp));
