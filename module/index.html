@@ -262,6 +262,7 @@
     <uib-tab heading="visualisation" ng-click="serviceMethods.addHeatMaps(dataModel, heatMapList)">
         <div ng-repeat="inputFormat in dataModel.formatColumns" class="heatmap" id="heatmap{{$index}}">
         </div>
+        <svg class="RdYlGn dayHeatMap"></svg>
     </uib-tab>
 </uib-tabset>
 

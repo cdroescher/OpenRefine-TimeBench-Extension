@@ -209,6 +209,7 @@ function ServiceMethods(http) {
             heatMap.init();
             heatMapList.push(heatMap);
         });
+        //new HeatMapDay(null, null);
     };
 }
 
@@ -279,7 +280,6 @@ function HeatMap(formatColumn, id) {
                 if (this.format.parse(e.day).getFullYear() === i) {
                     exists = true;
                 }
-
             }.bind(this));
             if (!exists) {
                 var svg = $("svg");
@@ -306,6 +306,14 @@ function HeatMap(formatColumn, id) {
             .attr("d", this.monthPath.bind(this));
 
         this.rect.filter(this.filterFunction.bind(this))
+            .on('mouseenter', function(d){
+                console.log("enter");
+                new HeatMapDay([{hour:1, count:0.01}, {hour:3, count:2}, {hour:5, count:2}])
+            })
+            .on('mouseleave', function(d){
+                console.log("leave");
+                //$(".dayHeatMap").html("");
+            })
             .attr("class", this.getColor.bind(this))
             .select("title");
     };
@@ -357,6 +365,56 @@ function HeatMap(formatColumn, id) {
     }
 }
 
+function HeatMapDay(data1) {
+    this.data = [0, 1, 2, 3, 4, 5, 6, 7, 8 ,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+    this.data1 = data1;
+    this.width = 20;
+    this.height = 20;
+
+    this.color = d3.scale.quantize()
+        .domain([-.05, .05])
+        .range(d3.range(11).map(function (d) {
+            return "q" + d + "-11";
+        }));
+
+    this.x = d3.scale.linear()
+        .domain([0, 24])
+        .range([0, 420]);
+
+    this.chart = d3.select(".dayHeatMap")
+        .attr("width", this.data.length*22)
+        .attr("height", this.height);
+
+    this.bar = this.chart.selectAll("g")
+        .data(this.data)
+        .enter().append("g")
+        .attr("transform", function(d, i) { return "translate(" + i * (this.width+2) + ",0)";}.bind(this));
+
+    this.bar.append("rect")
+        .attr("width", 20)
+        .attr("height", this.height);
+
+    this.getColor = function (d) {
+        var value = 0;
+        this.data1.forEach(function (element) {
+            if (element.hour == d) {
+                value = element.count;
+            }
+        });
+        return "day " + this.color(value);
+    };
+
+    this.bar.select("rect").filter(function(d){
+        return this.data1.filter(function(e){
+                return e.hour==d}).length!=0
+        }.bind(this))
+        .attr("class", this.getColor.bind(this));
+        //.attr("fill", "red");
+
+
+
+}
+
 var timeBenchExtensionApp = angular.module('timebenchExtension', ['ui.bootstrap']);
 
 timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $http) {
@@ -367,6 +425,7 @@ timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $ht
     $scope.dataModel = dataModel;
     $scope.serviceMethods = serviceMethods;
     $scope.heatMapList = [];
+
 
 });
 
