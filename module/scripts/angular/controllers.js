@@ -263,8 +263,7 @@ function HeatMap(formatColumn, id) {
         $("#heatmap" + this.id).height(190 * (this.maxYear - this.minYear + 1));
         $("#heatmapContainer" + this.id).height(190 * (this.maxYear - this.minYear + 1));
 
-        d3.select("#heatmap" + this.id)
-            .append("text")
+        this.svg.append("text")
             .attr("transform", "translate(-6," + this.cellSize * 3.5 + ")rotate(-90)")
             .style("text-anchor", "middle")
             .text(function (d) {
@@ -324,17 +323,17 @@ function HeatMap(formatColumn, id) {
                 $("#dayHeatMap" + this.id).html("");
                 var dayOfYear = this.dayFormat(new Date(d));
                 var maxHourCount = 0;
-                for (var hour in this.heatmapData[dayOfYear].hourCount) {
-                    if (this.heatmapData[dayOfYear].hourCount[hour] > maxHourCount) {
-                        maxHourCount = this.heatmapData[dayOfYear].hourCount[hour];
+                for (var hour in this.heatmapData[Number(dayOfYear)].hourCount) {
+                    if (this.heatmapData[Number(dayOfYear)].hourCount[hour] > maxHourCount) {
+                        maxHourCount = this.heatmapData[Number(dayOfYear)].hourCount[hour];
                     }
                 }
                 var hourCountRatio = 1 / maxHourCount;
                 var heatMapDayData = [];
-                for (hour in this.heatmapData[dayOfYear].hourCount) {
+                for (hour in this.heatmapData[Number(dayOfYear)].hourCount) {
                     heatMapDayData.push({
                         'hour': hour,
-                        count: hourCountRatio * this.heatmapData[dayOfYear].hourCount[hour]
+                        count: hourCountRatio * this.heatmapData[Number(dayOfYear)].hourCount[hour]
                     });
                 }
                 new HeatMapDay(this.id, heatMapDayData, d);
@@ -363,13 +362,16 @@ function HeatMap(formatColumn, id) {
                     dayCount[dayOfYear] = 1;
                 }
 
-                if (!hourCount[dayOfYear]) {
-                    hourCount[dayOfYear] = [];
-                }
-                if (hourCount[dayOfYear][hourOfDay]) {
-                    hourCount[dayOfYear][hourOfDay] = hourCount[dayOfYear][hourOfDay] + 1;
-                } else {
-                    hourCount[dayOfYear][hourOfDay] = 1;
+                var patt = /(K|k|h|H)/;
+                if (patt.test(this.heatmapData.format)) {
+                    if (!hourCount[dayOfYear]) {
+                        hourCount[dayOfYear] = [];
+                    }
+                    if (hourCount[dayOfYear][hourOfDay]) {
+                        hourCount[dayOfYear][hourOfDay] = hourCount[dayOfYear][hourOfDay] + 1;
+                    } else {
+                        hourCount[dayOfYear][hourOfDay] = 1;
+                    }
                 }
                 this.heatmapData.push({
                     dayOfYear: dayOfYear,
@@ -495,9 +497,9 @@ function HeatMapDay(id, data1, day) {
         .text(this.day);
     for (var i = 0; i <= 8; i++) {
         var hour;
-        if((i*3)<10){
+        if ((i * 3) < 10) {
             hour = "0" + (i * 3) + ":00";
-        }else {
+        } else {
             hour = i * 3 + ":00";
         }
 
