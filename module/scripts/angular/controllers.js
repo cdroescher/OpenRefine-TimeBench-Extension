@@ -93,6 +93,38 @@ function DataModel(projectId, cellIndex) {
         this.resultColumn.pagination.calculate();
     };
 
+    this.findMaxDayCount = function (){
+        var dayCount = [];
+        var years = [];
+        var dayFormat = d3.time.format("%j");
+        var maxDayCount=0;
+        this.formatColumns.forEach(function (formatColumn) {
+            dayCount.length = 0;
+            formatColumn.dateTimeValues.forEach(function (element) {
+                if (element.timestamp) {
+                    var date = new Date(Number(element.timestamp));
+                    years.push(date.getFullYear());
+                    var dayOfYear = Number(dayFormat(date));
+                    if (dayCount[dayOfYear]) {
+                        dayCount[dayOfYear] = dayCount[dayOfYear] + 1;
+                    } else {
+                        dayCount[dayOfYear] = 1;
+                    }
+                }
+            });
+            for (var property in dayCount) {
+                if (dayCount.hasOwnProperty(property)) {
+                    if (dayCount[property] > maxDayCount) {
+                        maxDayCount = dayCount[property];
+                    }
+                }
+            }
+        });
+
+
+        return maxDayCount;
+    };
+
     this.applyColumn = function (columnToApply, reformatResultColumn) {
         //if (!columnToApply.applied) {
         columnToApply.applied = true;
@@ -206,15 +238,15 @@ function ServiceMethods(http) {
     this.addHeatMaps = function (dataModel, heatMapList) {
         heatMapList.length = 0;
         $(".dayHeatMap").empty();
-        dataModel.formatColumns.forEach(function (e, i) {
-            var heatMap = new HeatMap(e, i);
+        dataModel.formatColumns.forEach(function (e, i, o) {
+            var heatMap = new HeatMap(e, i, dataModel.findMaxDayCount());
             heatMap.init();
             heatMapList.push(heatMap);
         });
     };
 }
 
-function HeatMap(formatColumn, id) {
+function HeatMap(formatColumn, id, maxDayCount) {
     this.formatColumn = formatColumn;
     this.rect = null;
     this.svg = null;
@@ -230,7 +262,7 @@ function HeatMap(formatColumn, id) {
     this.yearRange = [];
     this.maxYear = null;
     this.minYear = null;
-    this.maxDayCount = 0;
+    this.maxDayCount = maxDayCount;
     this.id = id;
 
     this.init = function () {
@@ -242,13 +274,8 @@ function HeatMap(formatColumn, id) {
                 return "q" + d + "-11";
             }));
 
-        $("#heatmap"+this.id+" text").remove();
-        d3.select("#heatmap" + this.id)
-            .append("text")
-            .attr("transform", "translate(45, 25)")
-            .text(function (d) {
-                return this.heatmapData.format;
-            }.bind(this));
+        //$("#heatmap"+this.id+" text").remove();
+
 
         this.svg = d3.select("#heatmap" + this.id).selectAll("g")
             .data(d3.range(this.minYear, this.maxYear + 1))
@@ -268,6 +295,13 @@ function HeatMap(formatColumn, id) {
             .style("text-anchor", "middle")
             .text(function (d) {
                 return d;
+            }.bind(this));
+
+        this.svg.append("text")
+            .attr("transform", "translate(80, -20)")
+            .style("text-anchor", "middle")
+            .text(function (d) {
+                return this.heatmapData.format;
             }.bind(this));
 
         this.rect = this.svg.selectAll(".day")
@@ -319,7 +353,6 @@ function HeatMap(formatColumn, id) {
 
         this.rect.filter(this.filterFunction.bind(this))
             .on('click', function (d) {
-                console.log("enter");
                 $("#dayHeatMap" + this.id).html("");
                 var dayOfYear = this.dayFormat(new Date(d));
                 var maxHourCount = 0;
@@ -351,13 +384,10 @@ function HeatMap(formatColumn, id) {
             if (element.timestamp) {
                 var date = new Date(Number(element.timestamp));
                 years.push(date.getFullYear());
-                var dayOfYear = this.dayFormat(date);
-                if (dayOfYear < 100) {
-                    dayOfYear = dayOfYear.substring(1);
-                }
+                var dayOfYear = Number(this.dayFormat(date));
                 var hourOfDay = this.hourFormat(date);
                 if (dayCount[dayOfYear]) {
-                    dayCount[dayOfYear] = dayCount[dayOfYear] + 1;
+                    dayCount[dayOfYear] += 1;
                 } else {
                     dayCount[dayOfYear] = 1;
                 }
@@ -368,7 +398,7 @@ function HeatMap(formatColumn, id) {
                         hourCount[dayOfYear] = [];
                     }
                     if (hourCount[dayOfYear][hourOfDay]) {
-                        hourCount[dayOfYear][hourOfDay] = hourCount[dayOfYear][hourOfDay] + 1;
+                        hourCount[dayOfYear][hourOfDay] += 1;
                     } else {
                         hourCount[dayOfYear][hourOfDay] = 1;
                     }
@@ -382,14 +412,7 @@ function HeatMap(formatColumn, id) {
             }
         }.bind(this));
 
-        for (var property in dayCount) {
-            if (dayCount.hasOwnProperty(property)) {
-                console.log(property);
-                if (dayCount[property] > this.maxDayCount) {
-                    this.maxDayCount = dayCount[property];
-                }
-            }
-        }
+
         var ratio = 1 / this.maxDayCount;
         this.heatmapData.forEach(function (e) {
             e.count = dayCount[e.dayOfYear] * ratio;
