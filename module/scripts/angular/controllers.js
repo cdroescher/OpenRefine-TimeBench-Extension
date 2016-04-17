@@ -204,6 +204,8 @@ function ServiceMethods(http) {
     };
 
     this.addHeatMaps = function (dataModel, heatMapList) {
+        heatMapList.length = 0;
+        $(".dayHeatMap").empty();
         dataModel.formatColumns.forEach(function (e, i) {
             var heatMap = new HeatMap(e, i);
             heatMap.init();
@@ -240,38 +242,34 @@ function HeatMap(formatColumn, id) {
                 return "q" + d + "-11";
             }));
 
-        d3.select("#heatmap"+this.id)
+        $("#heatmap"+this.id+" text").remove();
+        d3.select("#heatmap" + this.id)
             .append("text")
             .attr("transform", "translate(45, 25)")
             .text(function (d) {
                 return this.heatmapData.format;
             }.bind(this));
 
-        this.svg = d3.select("#heatmap"+this.id).selectAll("g")
+        this.svg = d3.select("#heatmap" + this.id).selectAll("g")
             .data(d3.range(this.minYear, this.maxYear + 1))
             .enter().append("g")
             .attr("width", this.width)
             .attr("height", this.height)
             .attr("class", "RdYlGn")
-            .attr("transform", function(d){
-                return "translate(" + ((this.width - this.cellSize * 53) / 2) + "," + (((this.height - this.cellSize * 7 - 1) + 30)+((d-this.minYear)*160)) + ")";
+            .attr("transform", function (d) {
+                return "translate(" + ((this.width - this.cellSize * 53) / 2) + "," + (((this.height - this.cellSize * 7 - 1) + 30) + ((d - this.minYear) * 160)) + ")";
             }.bind(this));
 
-        $("#heatmap"+this.id).height(190*(this.maxYear-this.minYear+1));
-        $("#heatmapContainer"+this.id).height(190*(this.maxYear-this.minYear+1));
+        $("#heatmap" + this.id).height(190 * (this.maxYear - this.minYear + 1));
+        $("#heatmapContainer" + this.id).height(190 * (this.maxYear - this.minYear + 1));
 
-        this.svg.append("text")
+        d3.select("#heatmap" + this.id)
+            .append("text")
             .attr("transform", "translate(-6," + this.cellSize * 3.5 + ")rotate(-90)")
             .style("text-anchor", "middle")
             .text(function (d) {
                 return d;
             }.bind(this));
-
-        this.svg.append("text")
-            .text(function (d) {
-                return this.heatmapData.format;
-            }.bind(this));
-
 
         this.rect = this.svg.selectAll(".day")
             .data(function (d) {
@@ -323,18 +321,21 @@ function HeatMap(formatColumn, id) {
         this.rect.filter(this.filterFunction.bind(this))
             .on('click', function (d) {
                 console.log("enter");
-                $("#dayHeatMap"+this.id).html("");
+                $("#dayHeatMap" + this.id).html("");
                 var dayOfYear = this.dayFormat(new Date(d));
-                var maxHourCount=0;
+                var maxHourCount = 0;
                 for (var hour in this.heatmapData[dayOfYear].hourCount) {
-                    if(this.heatmapData[dayOfYear].hourCount[hour] > maxHourCount){
+                    if (this.heatmapData[dayOfYear].hourCount[hour] > maxHourCount) {
                         maxHourCount = this.heatmapData[dayOfYear].hourCount[hour];
                     }
                 }
-                var hourCountRatio = 1/maxHourCount;
+                var hourCountRatio = 1 / maxHourCount;
                 var heatMapDayData = [];
-                for ( hour in this.heatmapData[dayOfYear].hourCount) {
-                    heatMapDayData.push({'hour': hour, count: hourCountRatio * this.heatmapData[dayOfYear].hourCount[hour]});
+                for (hour in this.heatmapData[dayOfYear].hourCount) {
+                    heatMapDayData.push({
+                        'hour': hour,
+                        count: hourCountRatio * this.heatmapData[dayOfYear].hourCount[hour]
+                    });
                 }
                 new HeatMapDay(this.id, heatMapDayData, d);
             }.bind(this))
@@ -352,47 +353,54 @@ function HeatMap(formatColumn, id) {
                 var date = new Date(Number(element.timestamp));
                 years.push(date.getFullYear());
                 var dayOfYear = this.dayFormat(date);
-                if(dayOfYear < 100){
+                if (dayOfYear < 100) {
                     dayOfYear = dayOfYear.substring(1);
                 }
                 var hourOfDay = this.hourFormat(date);
-                if(dayCount[dayOfYear]){
-                    dayCount[dayOfYear]=dayCount[dayOfYear]+1;
-                }else{
-                    dayCount[dayOfYear]=1;
+                if (dayCount[dayOfYear]) {
+                    dayCount[dayOfYear] = dayCount[dayOfYear] + 1;
+                } else {
+                    dayCount[dayOfYear] = 1;
                 }
-                if(!hourCount[dayOfYear]){
-                    hourCount[dayOfYear]=[];
+
+                if (!hourCount[dayOfYear]) {
+                    hourCount[dayOfYear] = [];
                 }
-                if(hourCount[dayOfYear][hourOfDay]){
-                    hourCount[dayOfYear][hourOfDay]=hourCount[dayOfYear][hourOfDay]+1;
-                }else{
-                    hourCount[dayOfYear][hourOfDay]=1;
+                if (hourCount[dayOfYear][hourOfDay]) {
+                    hourCount[dayOfYear][hourOfDay] = hourCount[dayOfYear][hourOfDay] + 1;
+                } else {
+                    hourCount[dayOfYear][hourOfDay] = 1;
                 }
-                this.heatmapData.push({dayOfYear: dayOfYear, day: this.format(date), count: 0.01, hourCount:hourCount[dayOfYear]});
+                this.heatmapData.push({
+                    dayOfYear: dayOfYear,
+                    day: this.format(date),
+                    count: 0.01,
+                    hourCount: hourCount[dayOfYear]
+                });
             }
         }.bind(this));
 
         for (var property in dayCount) {
             if (dayCount.hasOwnProperty(property)) {
                 console.log(property);
-                if(dayCount[property]>this.maxDayCount){
+                if (dayCount[property] > this.maxDayCount) {
                     this.maxDayCount = dayCount[property];
                 }
             }
         }
-        var ratio = 1/this.maxDayCount;
-        this.heatmapData.forEach(function(e){
-            e.count = dayCount[e.dayOfYear]*ratio;
+        var ratio = 1 / this.maxDayCount;
+        this.heatmapData.forEach(function (e) {
+            e.count = dayCount[e.dayOfYear] * ratio;
 
         });
         this.maxYear = Math.max.apply(Math, years);
         this.minYear = Math.min.apply(Math, years);
 
-        var cleanedHeatMapData=[];
-        this.heatmapData.forEach(function(e){
-            cleanedHeatMapData[e.dayOfYear]={day: e.day, count: e.count, hourCount: e.hourCount}
+        var cleanedHeatMapData = [];
+        this.heatmapData.forEach(function (e) {
+            cleanedHeatMapData[e.dayOfYear] = {day: e.day, count: e.count, hourCount: e.hourCount}
         });
+        cleanedHeatMapData.format = this.heatmapData.format;
         this.heatmapData = cleanedHeatMapData;
     };
 
@@ -434,7 +442,7 @@ function HeatMapDay(id, data1, day) {
     this.width = 20;
     this.height = 20;
     this.id = "#dayHeatMap" + id;
-    this.day=day;
+    this.day = day;
 
     this.color = d3.scale.quantize()
         .domain([0, 1])
@@ -447,7 +455,7 @@ function HeatMapDay(id, data1, day) {
         .range([0, 420]);
 
     this.chart = d3.select(this.id)
-        .attr("width", this.data.length * 22)
+        .attr("width", this.data.length * 30)
         .attr("height", this.height + 60);
 
     this.bar = this.chart.selectAll("g")
@@ -473,71 +481,42 @@ function HeatMapDay(id, data1, day) {
         return "day " + this.color(value);
     };
 
-    if(this.data1) {
+    if (this.data1) {
         this.bar.select("rect").filter(function (d) {
-            return this.data1.filter(function (e) {return e.hour == d}).length != 0
+            return this.data1.filter(function (e) {
+                    return e.hour == d
+                }).length != 0
         }.bind(this))
             .attr("class", this.getColor.bind(this));
     }
 
-    this.textPositionY = 70;
-    this.textSpaceX = 64;
-
     this.chart.append("text")
         .attr("transform", "translate(45, 20)")
         .text(this.day);
+    for (var i = 0; i <= 8; i++) {
+        var hour;
+        if((i*3)<10){
+            hour = "0" + (i * 3) + ":00";
+        }else {
+            hour = i * 3 + ":00";
+        }
 
-    this.chart.append("text")
-        .attr("transform", "translate(8, " + this.textPositionY + ")")
-        .text("00:00");
-
-    this.chart.append("text")
-        .attr("transform", "translate(72, " + this.textPositionY + ")")
-        .text("03:00");
-
-    this.chart.append("text")
-        .attr("transform", "translate(134," + this.textPositionY + ")")
-        .text("06:00");
-
-    this.chart.append("text")
-        .attr("transform", "translate(184, " + this.textPositionY + ")")
-        .text("09:00");
-
-    this.chart.append("text")
-        .attr("transform", "translate(248, " + this.textPositionY + ")")
-        .text("12:00");
-
-    this.chart.append("text")
-        .attr("transform", "translate(314, " + this.textPositionY + ")")
-        .text("15:00");
-
-    this.chart.append("text")
-        .attr("transform", "translate(378, " + this.textPositionY + ")")
-        .text("18:00");
-
-    this.chart.append("text")
-        .attr("transform", "translate(314, " + this.textPositionY + ")")
-        .text("21:00");
-
-    this.chart.append("text")
-        .attr("transform", "translate(314, " + this.textPositionY + ")")
-        .text("24:00");
-
-
+        var x = 8 + (i * 66);
+        this.chart.append("text")
+            .attr("transform", "translate(" + x + ", 70)")
+            .text(hour);
+    }
 }
 
 var timeBenchExtensionApp = angular.module('timebenchExtension', ['ui.bootstrap']);
 
 timeBenchExtensionApp.controller('timebenchExtensionCtrl', function ($scope, $http) {
-
     var dataModel = new DataModel(theProject.id, theProject.cellIndex);
     var serviceMethods = new ServiceMethods($http);
     serviceMethods.getColumn(dataModel, $scope);
     $scope.dataModel = dataModel;
     $scope.serviceMethods = serviceMethods;
     $scope.heatMapList = [];
-
-
 });
 
 
