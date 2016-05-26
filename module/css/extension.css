@@ -217,16 +217,24 @@ margin-bottom: 10px;
 
 .heatmapContainer{
     border: thin solid;
+    width: 1500px;
 }
 
 .heatmap{
-    width: 100%;
+    width: 950px;
     height: 170px;
 }
 
 .dayHeatMapContainer{
-    top: 200px;
+    top: 0;
     left:30px;
+    width: 200px;
+}
+
+.dayHeatMapContainer{
+    top: 0;
+    left:30px;
+    width: 200px;
 }
 
 .RdYlGn .q0-11{fill: rgba(230, 230, 255, 0.75)

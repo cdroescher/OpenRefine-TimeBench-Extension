@@ -85,7 +85,6 @@
         </div>
 
 
-
         <div id="outputFormatDiv">
 
             <div id="outputFormatDiv2">
@@ -99,7 +98,8 @@
                         uib-tooltip="enter date-time-format for result column"
                         tooltip-trigger="none"
                         tooltip-is-open="!dataModel.resultColumn.format">
-                <button id="refreshBtn" type="button" class="btn btn-info" id="refresh" ng-disabled="!dataModel.resultColumn.format"
+                <button id="refreshBtn" type="button" class="btn btn-info" id="refresh"
+                        ng-disabled="!dataModel.resultColumn.format"
                         ng-click="serviceMethods.reformatResultColumn(dataModel)">refresh
                 </button>
             </div>
@@ -119,7 +119,9 @@
                         ng-click="serviceMethods.addInputFormat(dataModel)" id="addInputFormats">add input format
                 </button>
             </div>
-            <button type="button" id="applyToDataModelBtn" class="btn btn-info" ng-disabled="!dataModel.resultColumn.format" ng-click="serviceMethods.applyToDataModel(dataModel)">apply to data model
+            <button type="button" id="applyToDataModelBtn" class="btn btn-info"
+                    ng-disabled="!dataModel.resultColumn.format" ng-click="serviceMethods.applyToDataModel(dataModel)">
+                apply to data model
             </button>
 
             <table id="explanation">
@@ -260,19 +262,14 @@
         </div>
     </uib-tab>
     <uib-tab heading="visualisation" ng-click="serviceMethods.addHeatMaps(dataModel, heatMapList)">
-        <div ng-repeat="inputFormat in dataModel.formatColumns"  class="heatmapContainer{{$index}} heatmapContainer">
-            <div>
-                <svg id="heatmap{{$index}}" class="heatmap"></svg>
-            </div>
-            <div class="dayHeatmapContainer">
-                <svg id="dayHeatMap{{$index}}" class="RdYlGn dayHeatMap" width="528" height="40"></svg>
-            </div>
+        <div ng-repeat="inputFormat in dataModel.formatColumns" class="heatmapContainer{{$index}} heatmapContainer">
+            <svg id="heatmap{{$index}}" class="heatmap"></svg>
+            <svg id="dayHeatMap{{$index}}" class="RdYlGn dayHeatMap" width="528" height="40"></svg>
+            <svg id="dayHeatMapHour{{$index}}" class="RdYlGn dayHeatMap" width="528" height="40"></svg>
+            <svg id="dayHeatMapMinute{{$index}}" class="RdYlGn dayHeatMap" width="528" height="40"></svg>
         </div>
-
     </uib-tab>
 </uib-tabset>
-
-
 
 
 </body>
