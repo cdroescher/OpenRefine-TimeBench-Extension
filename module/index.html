@@ -34,7 +34,7 @@
     </script>
     <script src="scripts/angular/HeatMapDataPrepare.js"/>
     <script src="bower_components/angular/angular.js"></script>
-
+    <script src="scripts/angular/ServiceMethods.js"></script>
     <script src="scripts/angular/controllers.js"></script>
 </head>
 <body ng-controller="timebenchExtensionCtrl">
@@ -52,7 +52,7 @@
             </div>
             <div id="reformatedValues">
                 <ul ng-repeat="formatColumn in dataModel.formatColumns">
-                    <h2 ng-click="dataModel.applyColumn(formatColumn, serviceMethods.reformatResultColumn)"
+                    <h2 ng-click="dataModel.applyColumn(formatColumn, serviceModule.reformatResultColumn)"
                         class="column-header" ng-class="{true: 'applied', false : ''}[formatColumn.applied]"
                         ng-click="dataModel.applyColumn(formatColumn)">{{formatColumn.format}}</h2>
                     <li ng-repeat="reformatedValue in formatColumn.pagination.result"
@@ -101,7 +101,7 @@
                         tooltip-is-open="!dataModel.resultColumn.format">
                 <button id="refreshBtn" type="button" class="btn btn-info" id="refresh"
                         ng-disabled="!dataModel.resultColumn.format"
-                        ng-click="serviceMethods.reformatResultColumn(dataModel)">refresh
+                        ng-click="serviceModule.reformatResultColumn(dataModel)">refresh
                 </button>
             </div>
             <div id="inputFormatDiv">
@@ -117,11 +117,11 @@
                         tooltip-is-open="!dataModel.inputFormatToAdd"
                         tooltip-placement="bottom">
                 <button type="button" class="btn btn-info" ng-disabled="!dataModel.inputFormatToAdd"
-                        ng-click="serviceMethods.addInputFormat(dataModel)" id="addInputFormats">add input format
+                        ng-click="serviceModule.addInputFormat(dataModel)" id="addInputFormats">add input format
                 </button>
             </div>
             <button type="button" id="applyToDataModelBtn" class="btn btn-info"
-                    ng-disabled="!dataModel.resultColumn.format" ng-click="serviceMethods.applyToDataModel(dataModel)">
+                    ng-disabled="!dataModel.resultColumn.format" ng-click="serviceModule.applyToDataModel(dataModel)">
                 apply to data model
             </button>
 
@@ -255,14 +255,14 @@
                 <div ng-repeat="inputFormat in dataModel.formatColumns" class="inputFormatElement">
                     <p>{{inputFormat.format}}</p>
                     <button type="button" class="btn btn-sm btn-danger"
-                            ng-click="serviceMethods.removeInputFormat(inputFormat.format,dataModel)">clear
+                            ng-click="serviceModule.removeInputFormat(inputFormat.format,dataModel)">clear
                     </button>
                 </div>
             </div>
 
         </div>
     </uib-tab>
-    <uib-tab heading="visualisation" ng-click="serviceMethods.addHeatMaps(dataModel, heatMapList)">
+    <uib-tab heading="visualisation" ng-click="serviceModule.addHeatMaps(dataModel, heatMapList)">
         <div ng-repeat="inputFormat in dataModel.formatColumns" class="heatmapContainer{{$index}} heatmapContainer">
             <svg id="heatmap{{$index}}" class="heatmap"></svg>
             <svg id="dayHeatMap{{$index}}" class="RdYlGn dayHeatMap" width="528" height="40"></svg>
