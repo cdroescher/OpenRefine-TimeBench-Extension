@@ -157,7 +157,6 @@ function DataModel(projectId, cellIndex) {
 }
 
 
-
 function HeatMap(column, id, dayCount) {
     this.rect = null;
     this.svg = null;
@@ -264,7 +263,7 @@ function HeatMap(column, id, dayCount) {
 
         this.rect.filter(this.filterFunction.bind(this))
             .on('click', function (selectedDay) {
-                $("#dayHeatMap" + this.id).html("");
+                $("#dayHeatMapHour" + this.id).html("");
                 new HeatMapHours(this.id, column, selectedDay);
             }.bind(this))
             .attr("class", this.getColor.bind(this))
@@ -304,7 +303,7 @@ function HeatMapHours(id, column, selectedDay) {
     }
     this.width = 17;
     this.height = 17;
-    this.id = "#dayHeatMap" + id;
+    this.id = "#dayHeatMapHour" + id;
 
     this.color = d3.scale.quantize()
         .domain([0, 1])
@@ -333,7 +332,8 @@ function HeatMapHours(id, column, selectedDay) {
         var day = d3.time.format("%j")(selectedDay);
         for (var hour in column.year[selectedDay.getFullYear()].day[day].hour) {
             if (hourElement == hour) {
-                return this.color(column.year[selectedDay.getFullYear()].day[day].hour[hour].count);
+                var ratio = 1 / column.year[selectedDay.getFullYear()].day[day].count;
+                return this.color(column.year[selectedDay.getFullYear()].day[day].hour[hour].count * ratio);
             }
         }
     };
@@ -357,10 +357,11 @@ function HeatMapHours(id, column, selectedDay) {
     };
 
     this.bar.filter(this.filterFunction)
-        .on('click', function (d) {
-            $("#dayHeatMapHour" + id).html("");
+        .on('click', function (selectedHour) {
+            $("#dayHeatMapMinute" + id).html("");
+            var day = d3.time.format("%j")(selectedDay);
             //TODO
-            new HeatMapMinutes("#dayHeatMapHour" + id, day, d);
+            new HeatMapMinutes(id, column.year[selectedDay.getFullYear()].day[day].hour[selectedHour], selectedDay);
         }.bind(this))
         .select("title");
 
@@ -370,10 +371,84 @@ function HeatMapHours(id, column, selectedDay) {
         .text(selectedDay);
 }
 
-function HeatMapMinutes(id, data1, selectedRect) {
+function HeatMapMinutes(id, selectedHour, selectedDay) {
     this.data = [];
     this.width = 17;
     this.height = 17;
+    this.id = "#dayHeatMapMinute" + id;
+
+    for (var i = 0; i < 60; i++) {
+        this.data.push(i);
+    }
+
+    this.color = d3.scale.quantize()
+        .domain([0, 1])
+        .range(d3.range(11).map(function (d) {
+            return "q" + d + "-11";
+        }));
+
+    this.x = d3.scale.linear()
+        .domain([0, 24])
+        .range([0, 420]);
+
+    this.chart = d3.select(this.id)
+        .attr("width", 200)
+        .attr("height", 200);
+
+    this.bar = this.chart.selectAll("g")
+        .data(this.data)
+        .enter().append("g")
+        .attr("transform", function (d, i) {
+            var x = Math.ceil((i + 1) / 6) * this.width;
+            var y = (i % 6 * this.height) + 57;
+            return "translate(" + x + "," + y + ")";
+        }.bind(this));
+
+    this.getColor = function (minuteElement) {
+        var ratio = 1 / selectedHour.count;
+        for (var minute in selectedHour.minute) {
+            if (minuteElement == minute) {
+                return this.color(selectedHour.minute[minute].count * ratio);
+            }
+        }
+    };
+
+    this.bar.append("rect")
+        .attr("width", this.width)
+        .attr("height", this.height)
+        .attr("fill", "rgb(255,255,255)")
+        .attr("stroke", "#ccc")
+        .attr("class", this.getColor.bind(this));
+
+    this.chart.append("text")
+        .attr("transform", "translate(45, 20)")
+        .text(selectedHour);
+
+    this.filterFunction = function (minuteElement) {
+        var contains = false;
+        for (var minute in selectedHour.minute) {
+            if (minuteElement == minute) {
+                contains = true;
+            }
+        }
+        return contains;
+    };
+
+    this.bar.filter(this.filterFunction)
+        .on('click', function (selectedMinute) {
+            $("#dayHeatMapSecond" + id).html("");
+            var day = d3.time.format("%j")(selectedDay);
+            //TODO
+            new HeatMapSeconds("#dayHeatMapSecond" + id, selectedHour.minute[selectedMinute], selectedDay);
+        }.bind(this))
+        .select("title");
+}
+
+function HeatMapSeconds(id, selectedMinute) {
+    this.data = [];
+    this.width = 17;
+    this.height = 17;
+
     for (var i = 0; i < 60; i++) {
         this.data.push(i);
     }
@@ -401,25 +476,22 @@ function HeatMapMinutes(id, data1, selectedRect) {
             return "translate(" + x + "," + y + ")";
         }.bind(this));
 
+    this.getColor = function (secondElement) {
+        var ratio = 1 / selectedMinute.count;
+        for (var second in selectedMinute.second) {
+            if (secondElement == second) {
+                return this.color(selectedMinute.second[secondElement] * ratio);
+            }
+        }
+    };
+
     this.bar.append("rect")
         .attr("width", this.width)
         .attr("height", this.height)
         .attr("fill", "rgb(255,255,255)")
-        .attr("stroke", "#ccc");
+        .attr("stroke", "#ccc")
+        .attr("class", this.getColor.bind(this));
 
-    this.getColor = function (d) {
-        var value = 0;
-        this.data1.forEach(function (element) {
-            if (element.hour == d) {
-                value = element.count;
-            }
-        });
-        return "day " + this.color(value);
-    };
-
-    this.chart.append("text")
-        .attr("transform", "translate(45, 20)")
-        .text(selectedRect);
 }
 
 

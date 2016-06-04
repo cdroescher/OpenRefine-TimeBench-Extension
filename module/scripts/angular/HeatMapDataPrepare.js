@@ -40,7 +40,7 @@ var HeatMapDataPrepareModule = (function (module) {
 
     var prepareDataForHourHeatMap = function (date, day) {
         var hourFormat = d3.time.format("%H");
-        var hourOfDay = hourFormat(date);
+        var hourOfDay = Number(hourFormat(date));
         if (!day.hour[hourOfDay]) {
             day.hour[hourOfDay] = {count: 1, minute: {}};
         } else {
@@ -52,7 +52,7 @@ var HeatMapDataPrepareModule = (function (module) {
 
     var prepareDataForMinuteHeatMap = function (date, hour) {
         var minuteFormat = d3.time.format("%M");
-        var minuteOfHour = minuteFormat(date);
+        var minuteOfHour = Number(minuteFormat(date));
         if (!hour.minute[minuteOfHour]) {
             hour.minute[minuteOfHour] = {count: 1, second: {}};
         } else {
@@ -63,7 +63,7 @@ var HeatMapDataPrepareModule = (function (module) {
 
     var prepareDataForSecondHeatMap = function (date, minute) {
         var secondFormat = d3.time.format("%S");
-        var secondOfMinute = secondFormat(date);
+        var secondOfMinute = Number(secondFormat(date));
         if (!minute.second[secondOfMinute]) {
             minute.second[secondOfMinute] = 1;
         } else {

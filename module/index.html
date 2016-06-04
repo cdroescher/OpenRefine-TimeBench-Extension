@@ -265,9 +265,9 @@
     <uib-tab heading="visualisation" ng-click="serviceModule.addHeatMaps(dataModel, heatMapList)">
         <div ng-repeat="inputFormat in dataModel.formatColumns" class="heatmapContainer{{$index}} heatmapContainer">
             <svg id="heatmap{{$index}}" class="heatmap"></svg>
-            <svg id="dayHeatMap{{$index}}" class="RdYlGn dayHeatMap" width="528" height="40"></svg>
             <svg id="dayHeatMapHour{{$index}}" class="RdYlGn dayHeatMap" width="528" height="40"></svg>
             <svg id="dayHeatMapMinute{{$index}}" class="RdYlGn dayHeatMap" width="528" height="40"></svg>
+            <svg id="dayHeatMapSecond{{$index}}" class="RdYlGn dayHeatMap" width="528" height="40"></svg>
         </div>
     </uib-tab>
 </uib-tabset>
