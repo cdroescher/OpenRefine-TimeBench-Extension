@@ -67,9 +67,9 @@ var HeatMapDataPrepareModule = (function (module) {
         var secondFormat = d3.time.format("%S");
         var secondOfMinute = Number(secondFormat(date));
         if (!minute.second[secondOfMinute]) {
-            minute.second[secondOfMinute] = 1;
+            minute.second[secondOfMinute] = {count: 1};
         } else {
-            minute.second[secondOfMinute] += 1;
+            minute.second[secondOfMinute].count += 1;
         }
     };
 

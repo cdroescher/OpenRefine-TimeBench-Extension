@@ -87,7 +87,7 @@ var serviceModule = (function (module) {
         $(".dayHeatMap").empty();
         var heatMapData = HeatMapDataPrepareModule.prepareDataForHeatMap(dataModel.formatColumns);
         heatMapData.column.forEach(function (column, i) {
-            var heatMap = new HeatMap(column, i, heatMapData.dayCount);
+            var heatMap = new HeatMapYear(column, i, heatMapData.dayCount);
             heatMap.init();
             heatMapList.push(heatMap);
         });

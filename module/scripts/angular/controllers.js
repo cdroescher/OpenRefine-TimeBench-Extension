@@ -1,9 +1,17 @@
 'use strict';
 
-
 var paginationVars = {
     'currentPage': 1,
     'numberPerPage': 30
+};
+
+var heatmapProperties = {
+    width: 17,
+    height: 17,
+    id: null,
+    childId: null,
+    title: null,
+    unit: null
 };
 
 function Pagination(dateTimeValues, paginationVars) {
@@ -156,8 +164,29 @@ function DataModel(projectId, cellIndex) {
     };
 }
 
+var getProperties = function (id) {
+    var cellSize = 17;
+    return {
+        cellSize: cellSize,
+        id: "#dayHeatMapHour" + id,
+        unit: 'hour',
+        elementCount: 24,
+        childProperties: {
+            id: "#dayHeatMapMinute" + id,
+            unit: 'minute',
+            cellSize: cellSize,
+            elementCount: 60,
+            childProperties: {
+                id: "#dayHeatMapSecond" + id,
+                unit: 'second',
+                cellSize: cellSize,
+                elementCount: 60
+            }
+        }
+    }
+};
 
-function HeatMap(column, id, dayCount) {
+function HeatMapYear(column, id, dayCount) {
     this.rect = null;
     this.svg = null;
     this.color = null;
@@ -223,8 +252,6 @@ function HeatMap(column, id, dayCount) {
             .attr("y", function (d) {
                 return d.getDay() * this.cellSize;
             }.bind(this));
-        //.datum(this.format);
-
 
         // delete empty heatmaps
         for (var i = minYear; i <= maxYear; i++) {
@@ -264,12 +291,22 @@ function HeatMap(column, id, dayCount) {
         this.rect.filter(this.filterFunction.bind(this))
             .on('click', function (selectedDay) {
                 $("#dayHeatMapHour" + this.id).html("");
-                new HeatMapHours(this.id, column, selectedDay);
+                var day = d3.time.format("%j")(selectedDay);
+                var properties = getProperties(this.id);
+                deleteChildMaps(properties);
+                properties.selectedUnit = column.year[selectedDay.getFullYear()].day[day];
+                properties.title = d3.time.format("%d.%m.%y")(selectedDay);
+                new HeatMap(properties);
             }.bind(this))
             .attr("class", this.getColor.bind(this))
             .select("title");
 
-
+        var deleteChildMaps = function (properties) {
+            if (properties.childProperties) {
+                $(properties.childProperties.id).html("");
+                deleteChildMaps(properties.childProperties);
+            }
+        }
     };
 
     this.filterFunction = function (d) {
@@ -296,220 +333,90 @@ function HeatMap(column, id, dayCount) {
     }
 }
 
-function HeatMapHours(id, column, selectedDay) {
-    this.data = [];
-    for (var i = 0; i < 24; i++) {
-        this.data.push(i);
-    }
-    this.width = 17;
-    this.height = 17;
-    this.id = "#dayHeatMapHour" + id;
-    this.format = d3.time.format("%Y-%m-%d");
+function HeatMap(properties) {
+    var data = [];
 
-    this.color = d3.scale.quantize()
+    for (var i = 0; i < properties.elementCount; i++) {
+        data.push(i);
+    }
+
+    var color = d3.scale.quantize()
         .domain([0, 1])
         .range(d3.range(11).map(function (d) {
             return "q" + d + "-11";
         }));
 
-    this.x = d3.scale.linear()
+    var x = d3.scale.linear()
         .domain([0, 24])
         .range([0, 420]);
 
-    this.chart = d3.select(this.id)
-        .attr("width", 150)
-        .attr("height", 200);
+    var chart = d3.select(properties.id)
+        .attr("width", (properties.elementCount / 6) * (properties.cellSize + 5))
+        .attr("height", 170);
 
-    this.bar = this.chart.selectAll("g")
-        .data(this.data)
+    var bar = chart.selectAll("g")
+        .data(data)
         .enter().append("g")
         .attr("transform", function (d, i) {
-            var x = Math.ceil((i + 1) / 6) * this.width;
-            var y = (i % 6 * this.height) + 75;
+            var x = Math.ceil((i + 1) / 6) * properties.cellSize;
+            var y = (i % 6 * properties.cellSize) + 45;
             return "translate(" + x + "," + y + ")";
         }.bind(this));
 
-    this.getColor = function (hourElement) {
-        var day = d3.time.format("%j")(selectedDay);
-        for (var hour in column.year[selectedDay.getFullYear()].day[day].hour) {
-            if (hourElement == hour) {
-                var ratio = 1 / column.year[selectedDay.getFullYear()].day[day].count;
-                return this.color(column.year[selectedDay.getFullYear()].day[day].hour[hour].count * ratio);
+    var getColor = function (unitElement) {
+        var ratio = 1 / properties.selectedUnit.count;
+        for (var element in properties.selectedUnit[properties.unit]) {
+            if (unitElement == element) {
+                return "day " + color(properties.selectedUnit[properties.unit][element].count * ratio);
             }
         }
     };
 
-    this.bar.append("rect")
-        .attr("width", this.width)
-        .attr("height", this.height)
+    bar.append("rect")
+        .attr("width", properties.cellSize)
+        .attr("height", properties.cellSize)
         .attr("fill", "rgb(255,255,255)")
         .attr("stroke", "#ccc")
-        .attr("class", this.getColor.bind(this));
+        .attr("class", getColor.bind(this));
 
-    this.bar.append("title")
-        .text(function (d) {
-            return d;
-        });
+    chart.append("text")
+        .attr("transform", "translate(18, 25)")
+        .text(properties.title);
 
-    this.filterFunction = function (hourElement) {
+    var filterFunction = function (unitElement) {
         var contains = false;
-        var day = d3.time.format("%j")(selectedDay);
-        for (var hour in column.year[selectedDay.getFullYear()].day[day].hour) {
-            if (hourElement == hour) {
+        for (var element in properties.selectedUnit[properties.unit]) {
+            if (unitElement == element) {
                 contains = true;
             }
         }
         return contains;
     };
 
-    this.bar.filter(this.filterFunction)
-        .on('click', function (selectedHour) {
-            $("#dayHeatMapMinute" + id).html("");
-            var day = d3.time.format("%j")(selectedDay);
-            new HeatMapMinutes(id, column.year[selectedDay.getFullYear()].day[day].hour[selectedHour]);
+    bar.filter(filterFunction)
+        .on('click', function (selectedElement) {
+            if (properties.childProperties) {
+                deleteChildMaps(properties);
+                properties.childProperties.selectedUnit = properties.selectedUnit[properties.unit][selectedElement];
+                properties.childProperties.elementCount = 60;
+                properties.childProperties.title = properties.unit + ": " + selectedElement;
+                new HeatMap(properties.childProperties);
+            }
         }.bind(this))
         .select("title");
 
-    this.chart.append("text")
-        .attr("transform", "translate(-20, 30)")
-        .text(this.format(selectedDay));
-}
-
-function HeatMapMinutes(id, selectedHour, selectedDay) {
-    this.data = [];
-    this.width = 17;
-    this.height = 17;
-    this.id = "#dayHeatMapMinute" + id;
-
-    for (var i = 0; i < 60; i++) {
-        this.data.push(i);
-    }
-
-    this.color = d3.scale.quantize()
-        .domain([0, 1])
-        .range(d3.range(11).map(function (d) {
-            return "q" + d + "-11";
-        }));
-
-    this.x = d3.scale.linear()
-        .domain([0, 24])
-        .range([0, 420]);
-
-    this.chart = d3.select(this.id)
-        .attr("width", 200)
-        .attr("height", 200);
-
-    this.bar = this.chart.selectAll("g")
-        .data(this.data)
-        .enter().append("g")
-        .attr("transform", function (d, i) {
-            var x = Math.ceil((i + 1) / 6) * this.width;
-            var y = (i % 6 * this.height) + 57;
-            return "translate(" + x + "," + y + ")";
-        }.bind(this));
-
-    this.getColor = function (minuteElement) {
-        var ratio = 1 / selectedHour.count;
-        for (var minute in selectedHour.minute) {
-            if (minuteElement == minute) {
-                return this.color(selectedHour.minute[minute].count * ratio);
-            }
-        }
-    };
-
-    this.bar.append("rect")
-        .attr("width", this.width)
-        .attr("height", this.height)
-        .attr("fill", "rgb(255,255,255)")
-        .attr("stroke", "#ccc")
-        .attr("class", this.getColor.bind(this));
-
-    this.chart.append("text")
-        .attr("transform", "translate(16, 20)")
-        .text("hour: " + selectedHour.current + " - minute heatmap");
-
-    this.filterFunction = function (minuteElement) {
-        var contains = false;
-        for (var minute in selectedHour.minute) {
-            if (minuteElement == minute) {
-                contains = true;
-            }
-        }
-        return contains;
-    };
-
-    this.bar.filter(this.filterFunction)
-        .on('click', function (selectedMinute) {
-            $("#dayHeatMapSecond" + id).html("");
-            new HeatMapSeconds("#dayHeatMapSecond" + id, selectedHour.minute[selectedMinute]);
-        }.bind(this))
-        .select("title");
-
-    this.bar.append("title")
-        .text(function (d) {
-            return d;
-        });
-}
-
-function HeatMapSeconds(id, selectedMinute) {
-    this.data = [];
-    this.width = 17;
-    this.height = 17;
-
-    for (var i = 0; i < 60; i++) {
-        this.data.push(i);
-    }
-
-    this.color = d3.scale.quantize()
-        .domain([0, 1])
-        .range(d3.range(11).map(function (d) {
-            return "q" + d + "-11";
-        }));
-
-    this.x = d3.scale.linear()
-        .domain([0, 24])
-        .range([0, 420]);
-
-    this.chart = d3.select(id)
-        .attr("width", 200)
-        .attr("height", 200);
-
-    this.bar = this.chart.selectAll("g")
-        .data(this.data)
-        .enter().append("g")
-        .attr("transform", function (d, i) {
-            var x = Math.ceil((i + 1) / 6) * this.width;
-            var y = (i % 6 * this.height) + 57;
-            return "translate(" + x + "," + y + ")";
-        }.bind(this));
-
-    this.getColor = function (secondElement) {
-        var ratio = 1 / selectedMinute.count;
-        for (var second in selectedMinute.second) {
-            if (secondElement == second) {
-                return this.color(selectedMinute.second[secondElement] * ratio);
-            }
-        }
-    };
-
-    this.bar.append("title")
+    bar.append("title")
         .text(function (d) {
             return d;
         });
 
-    this.bar.append("rect")
-        .attr("width", this.width)
-        .attr("height", this.height)
-        .attr("fill", "rgb(255,255,255)")
-        .attr("stroke", "#ccc")
-        .attr("class", this.getColor.bind(this));
-
-    this.chart.append("text")
-        .attr("transform", "translate(0, 20)")
-        .text("minute: " + selectedMinute.current + " - second heatmap");
-
+    var deleteChildMaps = function (properties) {
+        if (properties.childProperties) {
+            $(properties.childProperties.id).html("");
+            deleteChildMaps(properties.childProperties);
+        }
+    }
 }
-
 
 var timeBenchExtensionApp = angular.module('timebenchExtension', ['ui.bootstrap']);
 
