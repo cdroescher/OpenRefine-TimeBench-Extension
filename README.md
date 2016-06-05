@@ -6,18 +6,23 @@ This extension is at the begin of development.
 ## Usage
 ### column handling
 0. To open the OpenRefine extension click on the column context menu and select "reformat time values"
-![Image](https://github.com/cdroescher/OpenRefine-TimeBench-Extension/raw/master/docu/screenshots/1.png)
-
+</br>
+<img style="float: right;" src="https://github.com/cdroescher/OpenRefine-TimeBench-Extension/raw/master/docu/screenshots/1.png">
+</br>
 1. Default formats 'dd-MM-yyyy', 'MM-dd-yyyy', 'dd/MM/yy', 'MM/dd/yy', 'dd/MM', 'dd.MM.yyyy hh:mm:ss', 'dd.MM.yyyy hh:mm' are used out of the box
-![Image](https://github.com/cdroescher/OpenRefine-TimeBench-Extension/raw/master/docu/screenshots/3.png)
+</br>
+<img style="float: right;" src="https://github.com/cdroescher/OpenRefine-TimeBench-Extension/raw/master/docu/screenshots/3.png">
 Here you can see that only the formats 'dd.MM.yyyy hh:mm:ss' and 'dd.MM.yyyy hh:mm' are fitting to the input data.
 At the end you want a result column with normalized time-oriented data. For that please click at the column header to get the selected columns into the results.
-
+</br>
 2. Please add a result format in the input field i.e.: 'dd.MM.yyyy hh:mm:ss', 'E dd.MM.yyyy hh:mm:ss' or 'dd.MM.yy hh:mm' and click on refresh.
-![Image](https://github.com/cdroescher/OpenRefine-TimeBench-Extension/raw/master/docu/screenshots/2.png)
-
+</br>
+<img style="float: right;" src="https://github.com/cdroescher/OpenRefine-TimeBench-Extension/raw/master/docu/screenshots/2.png">
+</br>
 3. If the default formats are not fitting to your data you can add a custom input format
-![Image](https://github.com/cdroescher/OpenRefine-TimeBench-Extension/raw/master/docu/screenshots/4.png)
+</br>
+<img style="float: right;" src="https://github.com/cdroescher/OpenRefine-TimeBench-Extension/raw/master/docu/screenshots/4.png">
+</br>
 please be aware of that if you add a input format which is not valid or doesn't fit to any value, then nothing will happen.
 
 4. If you want apply the result column to your OpenRefine data model then click on 'apply to data model'
@@ -25,7 +30,9 @@ please be aware of that if you add a input format which is not valid or doesn't 
 ### visualization - heat map
 
 For each column a heat map bundle can be shown by clicking on the colored rectangles. The more color opacity more values are existing for the corresponding time value.
-![Image](https://github.com/cdroescher/OpenRefine-TimeBench-Extension/raw/master/docu/screenshots/5.png)
+</br>
+<img style="float: right;" src="https://github.com/cdroescher/OpenRefine-TimeBench-Extension/raw/master/docu/screenshots/5.png">
+</br>
 
 
 ##Installation
