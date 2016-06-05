@@ -18,7 +18,8 @@ var HeatMapDataPrepareModule = (function (module) {
                     if(!result.column[index].year[yeart]){
                         result.column[index].year[yeart] = {
                             day: {},
-                            count: 1
+                            count: 1,
+                            current: yeart
                         }
                     }else{
                         result.column[index].year[yeart].count += 1;
@@ -27,7 +28,8 @@ var HeatMapDataPrepareModule = (function (module) {
                     if (!result.column[index].year[yeart].day[dayOfYear]) {
                         result.column[index].year[yeart].day[dayOfYear] = {
                             hour: {},
-                            count: 1
+                            count: 1,
+                            current: dayOfYear
                         };
                     }else{
                         result.column[index].year[yeart].day[dayOfYear].count += 1;
@@ -42,7 +44,7 @@ var HeatMapDataPrepareModule = (function (module) {
         var hourFormat = d3.time.format("%H");
         var hourOfDay = Number(hourFormat(date));
         if (!day.hour[hourOfDay]) {
-            day.hour[hourOfDay] = {count: 1, minute: {}};
+            day.hour[hourOfDay] = {count: 1, minute: {}, current: hourOfDay};
         } else {
             day.hour[hourOfDay].count += 1;
         }
@@ -54,7 +56,7 @@ var HeatMapDataPrepareModule = (function (module) {
         var minuteFormat = d3.time.format("%M");
         var minuteOfHour = Number(minuteFormat(date));
         if (!hour.minute[minuteOfHour]) {
-            hour.minute[minuteOfHour] = {count: 1, second: {}};
+            hour.minute[minuteOfHour] = {count: 1, second: {}, current: minuteOfHour};
         } else {
             hour.minute[minuteOfHour].count += 1;
         }
