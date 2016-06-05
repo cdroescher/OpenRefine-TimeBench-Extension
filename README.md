@@ -8,7 +8,10 @@ This extension is at the begin of development.
 0. Follow the steps at https://github.com/OpenRefine/OpenRefine/wiki/Installing-Extensions
 
 ## Usage
-0. Open „exampleInputDates.txt“ or create a project
+0. To open the OpenRefine extension click on the column context menu and select "reformat time values"
+![Image](https://github.com/cdroescher/OpenRefine-TimeBench-Extension/raw/master/docu/screenshots/1.png)
+
+
 0. Click on the button „date operations“ on the right upper corner
   0. select „reformat date“ from the drop down list
   	0. add several expected input formats
